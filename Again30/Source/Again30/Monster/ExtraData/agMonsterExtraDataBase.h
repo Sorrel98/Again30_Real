@@ -16,5 +16,5 @@ class AGAIN30_API UagMonsterExtraDataBase : public UDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Spawn")
-	EagMonsterMovePointType SpawnMovePoint = EagMonsterMovePointType::None;
+	EagMonsterMovePointType InitSpawnMovePoint = EagMonsterMovePointType::None;
 };
