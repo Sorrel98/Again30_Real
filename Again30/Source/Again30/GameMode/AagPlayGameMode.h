@@ -39,6 +39,7 @@ private:
 
 public:
 	AagPlayGameMode();
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -48,13 +49,18 @@ public:
 	void GenerationEnd();
 
 	void IncreaseGeneration();
-	
+
+	// Manager
+	bool GetManager(EagManagerType type, TObjectPtr<class UagManagerBase>& manager);
+
 private:
 	void SpawnFish();
 	APlayerStart* GetPlayerStartPoint();
 
 
 protected:
+	// manager
+	void _setManagerContainer();
 	TObjectPtr<class UagManagerBase> _createManager(EagManagerType type);
 	
 	UPROPERTY()
@@ -62,4 +68,10 @@ protected:
 
 	UPROPERTY()
 	TMap<EagManagerType, TObjectPtr<class UagManagerBase>> _managerContainer;
+	// monster
+	UPROPERTY()
+	TObjectPtr<class AagMonsterBase> _monster = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class AagMonsterMovePoint>> _movePointContainer;
 };

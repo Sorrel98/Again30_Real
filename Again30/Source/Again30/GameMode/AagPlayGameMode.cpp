@@ -2,7 +2,8 @@
 
 #include "agGameModeExtraData.h"
 #include "EngineUtils.h"
-#include "Again30/Manager/UagMonsterMoveManager.h"
+#include "Again30/Manager/agMonsterMoveManager.h"
+#include "Again30/Monster/agMonsterBase.h"
 #include "GameFramework/PlayerStart.h"
 
 AagPlayGameMode::AagPlayGameMode()
@@ -11,28 +12,16 @@ AagPlayGameMode::AagPlayGameMode()
 {
 }
 
+void AagPlayGameMode::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	_setManagerContainer();
+}
+
 void AagPlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// @todo 야매
-	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
-	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
-	if ( _extraData != nullptr ){
-		for ( auto managerType : _extraData->ManagerList ){
-			if ( managerType == EagManagerType::None ){
-				continue;
-			}
-			// @todo factory패턴으로 하고 싶었다.
-			auto newManagerObject = _createManager(managerType);
-			if (newManagerObject != nullptr)
-			{
-				newManagerObject->BeginPlay();
-				_managerContainer.Add(managerType, newManagerObject);
-			}
-		}
-	}
-	
 }
 
 void AagPlayGameMode::Tick(float DeltaSeconds)
@@ -66,6 +55,17 @@ void AagPlayGameMode::IncreaseGeneration()
 	OnGenerationChanged.Broadcast(CurGeneration);
 }
 
+bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>& manager )
+{
+	if( _managerContainer.Contains(type) )
+	{
+		manager = _managerContainer[type];
+		return true;
+	}
+	return false;
+}
+
+
 void AagPlayGameMode::SpawnFish()
 {
 	APlayerStart* StartPoint = GetPlayerStartPoint();
@@ -96,6 +96,27 @@ APlayerStart* AagPlayGameMode::GetPlayerStartPoint()
 		}
 	}
 	return FoundPlayerStart;
+}
+
+void AagPlayGameMode::_setManagerContainer()
+{
+	// @todo 야매
+	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
+	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
+	if( _extraData != nullptr ){
+		for( auto managerType : _extraData->ManagerList ){
+			if( managerType == EagManagerType::None ){
+				continue;
+			}
+			// @todo factory패턴으로 하고 싶었다.
+			auto newManagerObject = _createManager( managerType );
+			if( newManagerObject != nullptr )
+			{
+				newManagerObject->BeginPlay();
+				_managerContainer.Add( managerType, newManagerObject );
+			}
+		}
+	}
 }
 
 TObjectPtr<UagManagerBase> AagPlayGameMode::_createManager(EagManagerType type)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Again30/Library/agEnumClass.h"
 #include "GameFramework/Character.h"
 #include "agMonsterBase.generated.h"
 
@@ -12,17 +13,18 @@ class AGAIN30_API AagMonsterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AagMonsterBase();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void _initMonster();
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FVector _getMonsterLocation(EagMonsterMovePointType pointType);
+	void _setMonsterLocation(const FVector& location );
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(EditAnywhere, Blueprintable, BlueprintReadWrite, Category="Again30")
+	TObjectPtr<class UagMonsterExtraDataBase> _extraData;
 };

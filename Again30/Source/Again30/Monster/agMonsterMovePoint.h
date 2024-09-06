@@ -16,8 +16,9 @@ public:
 	AagMonsterMovePoint();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual EagMonsterMovePointType GetType();
 
 protected:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30")
 	EagMonsterMovePointType _pointType = EagMonsterMovePointType::None;
 };
