@@ -218,6 +218,14 @@ void AagMonsterBase::_monsterDead()
 		return;
 	}
 	SetState(EegMonsterState::Corpse);
+	auto mesh = GetMesh();
+	if( mesh == nullptr ){
+		return;
+	}
+	mesh->SetSimulatePhysics( true );
+	mesh->SetCollisionProfileName(TEXT("Ragdoll"));
+	mesh->SetAnimationMode(EAnimationMode::AnimationCustomMode);
+	
 	again30GameMode->FishWin();
 }
 
