@@ -53,6 +53,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
+	/** Attack Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
+	
+
 
 	/** Jump Property */
 
@@ -108,6 +113,9 @@ public:
 	void OnSpawnProductionEnd();
 	void OnDeadProductionEnd();
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnFishDead", Category = "Fish")
+	void K2_OnFishDead();
+
 
 protected:
 
@@ -116,6 +124,10 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void Attack();
+
+	void Interact();
 
 	virtual void Jump() override;
 
