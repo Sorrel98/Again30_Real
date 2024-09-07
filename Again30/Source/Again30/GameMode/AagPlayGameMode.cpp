@@ -40,6 +40,11 @@ void AagPlayGameMode::BeginPlay()
 
 	SpectatorCameraActor = GetWorld()->SpawnActor<ACameraActor>(ACameraActor::StaticClass());
 
+	if(CurrentMonster == nullptr)
+	{
+		CurrentMonster = Cast<AagMonsterBase>(UGameplayStatics::GetActorOfClass(GetWorld(), AagMonsterBase::StaticClass()));
+	}
+
 	// @todo 야매
 	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
 	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
@@ -157,6 +162,11 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 
 void AagPlayGameMode::SetProductionCamera(AagFish* FishPawn)
 {
+	if(bDisableProduction) [[unlikely]]
+	{
+		return;
+	}
+	
 	if(FishPawn && SpectatorCameraActor)
 	{
 		FVector CameraPosition = FishPawn->GetActorLocation();

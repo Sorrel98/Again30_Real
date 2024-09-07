@@ -5,6 +5,8 @@
 #include "GameFramework/GameMode.h"
 #include "AagPlayGameMode.generated.h"
 
+class AagMonsterBase;
+class USoundCue;
 class AagFish;
 class APlayerStart;
 class AagPlayGameMode;
@@ -37,8 +39,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Production" ,meta = (AllowPrivateAccess = true))
 	float CameraAboveHeight;
 	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test" ,meta = (AllowPrivateAccess = true))
+	bool bDisableProduction;
+	
 	/** 현재 물고기 사망-스폰 연출 중인지 여부 */
 	bool bNowDoingFishProduction;
+
+	/** 똥겜 특 : 브금 좋음 */
+	UPROPERTY()
+	TObjectPtr<USoundCue> NormalSounds; // 평범하고 아름다운 브금
+	UPROPERTY()
+	TObjectPtr<USoundCue> FinalSound; // 격양된 브금
 
 	// Caching
 	UPROPERTY()
@@ -47,6 +59,8 @@ private:
 	TObjectPtr<APlayerController> CurrentPlayController;
 	UPROPERTY()
 	TObjectPtr<ACameraActor> SpectatorCameraActor;
+	UPROPERTY()
+	TObjectPtr<AagMonsterBase> CurrentMonster;
 
 public:
 	AagPlayGameMode();
