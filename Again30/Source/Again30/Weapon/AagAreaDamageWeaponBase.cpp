@@ -52,9 +52,9 @@ void AagAreaDamageWeaponBase::Tick(float DeltaSeconds)
 	}
 }
 
-void AagAreaDamageWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName)
+void AagAreaDamageWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName, ACharacter* Character)
 {
-	Super::EquipWeapon(SkeletalToAttach, AttackSocketName);
+	Super::EquipWeapon(SkeletalToAttach, AttackSocketName, Character);
 
 	ToggleDamageArea();
 }
