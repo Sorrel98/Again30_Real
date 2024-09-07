@@ -109,6 +109,9 @@ void AagFish::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AagFish::Look);
+
+		// Attacking
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AagFish::Attack);
 	}
 	else
 	{
@@ -216,6 +219,10 @@ void AagFish::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AagFish::Attack()
+{
 }
 
 void AagFish::Jump()
