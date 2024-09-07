@@ -24,7 +24,7 @@ AagWeaponBase::AagWeaponBase()
 
 void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName, ACharacter* Character)
 {
-	OwnerCharacter = Character;
+	OwnerFish = Character;
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 
 	if(WeaponMesh && SkeletalToAttach)
@@ -86,13 +86,35 @@ void AagWeaponBase::WeaponAttackEnd()
 	bAttacked = true;
 }
 
+void AagWeaponBase::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(bNowDoingAttack && bAttacked == false)
+	{
+		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
+		{
+			Damageable->DealDamage(WeaponDamage, this);
+			bAttacked = true;
+		}
+	}
+}
+
 void AagWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if(WeaponMesh)
 	{
-		WeaponMesh->OnComponentHit.AddDynamic(this, &AagWeaponBase::OnWeaponHit);
+		if (bPhysicsWeapon)
+		{
+			WeaponMesh->OnComponentHit.AddDynamic(this, &AagWeaponBase::OnWeaponHit);
+			WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+		}
+		else
+		{
+			WeaponMesh->OnComponentBeginOverlap.AddDynamic(this, &AagWeaponBase::OnWeaponOverlap);
+		}
+		
 	}
 }
 

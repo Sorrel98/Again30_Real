@@ -61,6 +61,8 @@ public:
 	
 
 protected:
+	UFUNCTION()
+	void OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void BeginPlay() override;
 
 private:
@@ -68,5 +70,5 @@ private:
 	virtual void OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess=true))
-	ACharacter* OwnerCharacter;
+	ACharacter* OwnerFish;
 };
