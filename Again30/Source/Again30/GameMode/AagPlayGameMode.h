@@ -48,6 +48,7 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
+	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -74,9 +75,13 @@ public:
 		}
 		return false;
 	}
+	void PostCreateManager();
 
 	// Monster
 	int32 GetNewMonsterUID();
+	void RegisterMovePoint(EagMonsterMovePointType type, TObjectPtr<class AagMonsterMovePoint> movePoint);
+	void AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint);
+	bool GetMovePointLocation(EagMonsterMovePointType type, FVector& location);
 
 private:
 	void CalculateGenerationTime(float DeltaSeconds);
@@ -103,6 +108,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class AagMonsterBase> _monster = nullptr;
 	UPROPERTY()
-	TArray<TObjectPtr<class AagMonsterMovePoint>> _movePointContainer;
+	TMap<EagMonsterMovePointType, TObjectPtr<class AagMonsterMovePoint>> _pointContainer;
 	int32 _monsterUID = 1;
 };

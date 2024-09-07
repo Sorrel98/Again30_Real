@@ -29,16 +29,18 @@ class AGAIN30_API UagMonsterMoveManager : public UagManagerBase
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float elapsedTime) override;
-	void AddMonsterMovePoint( EagMonsterMovePointType type, const TObjectPtr<class AagMonsterMovePoint>& movePoint );
+	virtual void PostCreated(TObjectPtr<class AagPlayGameMode> mode) override;
+	
+	
 	bool GetMovePointLocation( EagMonsterMovePointType type, FVector& location );
-
 	void RequestMoveToPoint(const TObjectPtr<class AagMonsterBase>& monster, EagMonsterMovePointType pointType, float duration);
 
 protected:
 	void _move(float elapsedTime);
-	
+
 	UPROPERTY()
-	TMap<EagMonsterMovePointType, TObjectPtr<class AagMonsterMovePoint>> _pointContainer;
+	TObjectPtr<AagPlayGameMode> _playGameMode = nullptr;
+	
 
 	UPROPERTY()
 	TMap<int32, FvMonsterMoveData> _movingContainer;
