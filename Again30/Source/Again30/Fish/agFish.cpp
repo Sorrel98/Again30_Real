@@ -15,7 +15,6 @@
 #include "InputActionValue.h"
 
 AagFish::AagFish(FObjectInitializer const& ObjectInitializer)
-: Super(ObjectInitializer.SetDefaultSubobjectClass<UagFishMovement>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
