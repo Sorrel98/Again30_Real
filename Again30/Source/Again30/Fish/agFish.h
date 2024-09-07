@@ -86,7 +86,6 @@ public:
 	// Sets default values for this character's properties
 	AagFish(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	AagFish();
 	virtual void UnPossessed() override;
 
 
