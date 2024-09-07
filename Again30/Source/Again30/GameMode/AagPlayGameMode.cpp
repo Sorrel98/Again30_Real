@@ -46,26 +46,7 @@ void AagPlayGameMode::BeginPlay()
 	{
 		CurrentMonster = Cast<AagMonsterBase>(UGameplayStatics::GetActorOfClass(GetWorld(), AagMonsterBase::StaticClass()));
 	}
-
-	// @todo 야매
-	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
-	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
-	if ( _extraData != nullptr ){
-		for ( auto managerType : _extraData->ManagerList ){
-			if ( managerType == EagManagerType::None ){
-				continue;
-			}
-			// @todo factory패턴으로 하고 싶었다.
-			auto newManagerObject = _createManager(managerType);
-			if (newManagerObject != nullptr)
-			{
-				newManagerObject->BeginPlay();
-				_managerContainer.Add(managerType, newManagerObject);
-			}
-		}
-	}
-
-
+	
 	GameStart();
 }
 

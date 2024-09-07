@@ -24,5 +24,7 @@ public:
 	EagMonsterMovePointType InitSpawnMovePoint = EagMonsterMovePointType::None;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Anim")
-	FSoftObjectPath MoveAnim;
+	FSoftObjectPath TakeDamageMontage;
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Anim")
+	FSoftObjectPath CorpseMontage;
 };

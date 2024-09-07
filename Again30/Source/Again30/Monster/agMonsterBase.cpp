@@ -87,26 +87,34 @@ void AagMonsterBase::SetState(EegMonsterState state)
 	_attribute.state = state;
 }
 
-void AagMonsterBase::_monsterDead()
-{
-	TObjectPtr<AagPlayGameMode> again30GameMode = nullptr;
-	if( _getAgGameMode(again30GameMode) == false ){
-		return;
-	}
-	SetState(EegMonsterState::Corpse);
-	again30GameMode->FishWin();
-}
-
 float AagMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	TakeDamage(Damage);
+	return Damage;
+}
+
+void AagMonsterBase::TakeDamage(float damage)
+{
 	if( _attribute.HP <= 0 ){
-		return 0.f;
+		return;
 	}
-	_attribute.HP -= Damage;
+	_attribute.HP -= damage;
 	if( _attribute.HP <= 0 ){
 		_monsterDead();
+		return;
 	}
-	return 0.f;
+	// action montage
+	const auto& mesh = GetMesh();
+	if( mesh == nullptr ){
+		return;
+	}
+	const auto animInstance = mesh->GetAnimInstance();
+	if( animInstance == nullptr ){
+		return;
+	}
+	if( animInstance->IsAnyMontagePlaying() == false ){
+		_action->PlayMontage(this, _extraData->TakeDamageMontage);
+	}
 }
 
 void AagMonsterBase::_initMonster()
@@ -114,8 +122,9 @@ void AagMonsterBase::_initMonster()
 	_initLocation();
 	_initAction();
 	_initAttribute();
-	
+
 	MoveMonster(EagMonsterMovePointType::Bed);
+	//TakeDamage(10000);
 }
 
 void AagMonsterBase::_initLocation()
@@ -199,4 +208,14 @@ bool AagMonsterBase::_getAgGameMode( TObjectPtr<class AagPlayGameMode>& again30G
 	}
 	again30GameMode = Cast<AagPlayGameMode>(gameMode);
 	return true;
+}
+
+void AagMonsterBase::_monsterDead()
+{
+	TObjectPtr<AagPlayGameMode> again30GameMode = nullptr;
+	if( _getAgGameMode(again30GameMode) == false ){
+		return;
+	}
+	SetState(EegMonsterState::Corpse);
+	again30GameMode->FishWin();
 }
