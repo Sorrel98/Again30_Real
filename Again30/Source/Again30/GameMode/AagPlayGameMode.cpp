@@ -5,12 +5,13 @@
 #include "Again30/Monster/agMonsterBase.h"
 #include "Again30/Fish/agFish.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
+#include "Camera/CameraActor.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 AagPlayGameMode::AagPlayGameMode()
 	:
-	GenerationTime(10.f), CurGeneration(1)
+	GenerationTime(10.f), CurGeneration(0), CameraAboveHeight(400.f)
 {
 	CurGenerationTime = GenerationTime;
 }
@@ -36,6 +37,8 @@ APawn* AagPlayGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlaye
 void AagPlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpectatorCameraActor = GetWorld()->SpawnActor<ACameraActor>(ACameraActor::StaticClass());
 
 	// @todo 야매
 	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
@@ -86,6 +89,7 @@ void AagPlayGameMode::CalculateGenerationTime(float DeltaSeconds)
 
 void AagPlayGameMode::GameStart()
 {
+	bNowDoingFishProduction = true;
 	SpawnFish();
 }
 
@@ -95,7 +99,7 @@ void AagPlayGameMode::GenerationStart()
 	{
 		return;
 	}
-	
+	UE_LOG(LogTemp, Warning, TEXT("*** *** *** Generation Start"));
 	bNowDoingFishProduction = false;
 	CurGenerationTime = GenerationTime;
 	IncreaseGeneration();
@@ -103,9 +107,11 @@ void AagPlayGameMode::GenerationStart()
 
 void AagPlayGameMode::GenerationEnd()
 {
-	GetWorld()->GetFirstPlayerController()->UnPossess();
 	if(CurrentFish)
 	{
+		CurrentFish->DisableInput(GetWorld()->GetFirstPlayerController());
+		CurrentFish->UnPossessed();
+		SetProductionCamera(CurrentFish);
 		CurrentFish->PlayFishDeadProduction();
 	}
 	
@@ -149,6 +155,23 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 }
 
 
+void AagPlayGameMode::SetProductionCamera(AagFish* FishPawn)
+{
+	if(FishPawn && SpectatorCameraActor)
+	{
+		FVector CameraPosition = FishPawn->GetActorLocation();
+		CameraPosition.Z += CameraAboveHeight;
+		const FRotator CameraRotation = FVector(FishPawn->GetActorLocation() - CameraPosition).Rotation();
+		SpectatorCameraActor->SetActorLocation(CameraPosition);
+		SpectatorCameraActor->SetActorRotation(CameraRotation);
+
+		if(GetWorld()->GetFirstPlayerController())
+		{
+			GetWorld()->GetFirstPlayerController()->SetViewTarget(SpectatorCameraActor);
+		}
+	}
+}
+
 void AagPlayGameMode::SpawnFish()
 {
 	const APlayerStart* StartPoint = GetPlayerStartPoint();
@@ -166,7 +189,11 @@ void AagPlayGameMode::SpawnFish()
 	if(FishPawn)
 	{
 		CurrentFish = FishPawn;
-		GetWorld()->GetFirstPlayerController()->Possess(FishPawn);
+		if(APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			PlayerController->Possess(FishPawn);
+			FishPawn->DisableInput(PlayerController);
+		}
 		FishPawn->OnFishSpawnProductionEnd.AddUObject(this, &AagPlayGameMode::OnFishSpawnProductionEnd);
 		FishPawn->OnFishDeadProductionEnd.AddUObject(this, &AagPlayGameMode::OnFishDeadProductionEnd);
 		FActorSpawnParameters SpawnParameters;
@@ -174,6 +201,8 @@ void AagPlayGameMode::SpawnFish()
 		UGameplayStatics::FinishSpawningActor(CurrentFish, SpawnTransform);
 		CurrentFish->PlayFishSpawnProduction();
 	}
+
+	SetProductionCamera(FishPawn);
 }
 
 void AagPlayGameMode::OnFishDeadProductionEnd()
@@ -185,8 +214,11 @@ void AagPlayGameMode::OnFishSpawnProductionEnd()
 {
 	if(APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
+		PlayerController->SetViewTarget(CurrentFish);
 		FInputModeGameOnly InputModeGameOnly;
 		PlayerController->SetInputMode(InputModeGameOnly);
+
+		CurrentFish->EnableInput(PlayerController);
 	}
 	
 	GenerationStart();

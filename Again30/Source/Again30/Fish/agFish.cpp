@@ -50,6 +50,22 @@ AagFish::AagFish()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void AagFish::UnPossessed()
+{
+	Super::UnPossessed();
+
+	if (InputComponent)
+	{
+		InputComponent->ClearActionBindings();
+	}
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent != nullptr)
+	{
+		MovementComponent->ResetMoveState();
+		MovementComponent->StopMovementImmediately();
+	}
+}
+
 void AagFish::BeginPlay()
 {
 	// Call the base class  

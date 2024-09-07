@@ -34,6 +34,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Rule" ,meta = (AllowPrivateAccess = true))
 	int32 CurGeneration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Production" ,meta = (AllowPrivateAccess = true))
+	float CameraAboveHeight;
+	
 	/** 현재 물고기 사망-스폰 연출 중인지 여부 */
 	bool bNowDoingFishProduction;
 
@@ -42,6 +45,8 @@ private:
 	TObjectPtr<AagFish> CurrentFish;
 	UPROPERTY()
 	TObjectPtr<APlayerController> CurrentPlayController;
+	UPROPERTY()
+	TObjectPtr<ACameraActor> SpectatorCameraActor;
 
 public:
 	AagPlayGameMode();
@@ -65,6 +70,8 @@ private:
 	void SpawnFish();
 	APlayerStart* GetPlayerStartPoint();
 
+	/** 연출 카메라는 내가 집도한다 */
+	void SetProductionCamera(AagFish* FishPawn);
 	/** 물고기 사망 연출이 끝난 뒤 불리게 될 함수 */
 	void OnFishDeadProductionEnd();
 	/** 물고기 스폰 연출이 끝난 뒤 불리게 될 함수 */
