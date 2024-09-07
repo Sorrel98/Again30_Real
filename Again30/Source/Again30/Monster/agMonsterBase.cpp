@@ -36,7 +36,25 @@ void AagMonsterBase::BeginPlay()
 void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	// @todo remove monster hp bar test
+	_elapsedTime += DeltaTime;
+	if( _elapsedTime >= 1 ){
+		_attribute.HP -= 1;
+		_elapsedTime = 0;
+	}
+
+	if( _extraData == nullptr ){
+		return;
+	}
+	if( _useHpBar == true ){
+		_hpBarShow_ElapsedTime += DeltaTime;
+		if( _hpBarShow_ElapsedTime >= _extraData->HpBarShowTime ){
+			SetHpBarVisible( false );
+			_hpBarShow_ElapsedTime = 0;
+			_useHpBar = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -89,6 +107,19 @@ void AagMonsterBase::SetState(EegMonsterState state)
 	_attribute.state = state;
 }
 
+float AagMonsterBase::GetHp()
+{
+	return _attribute.HP;
+}
+
+void AagMonsterBase::SetHpBarVisible_Implementation(bool isVisible)
+{
+}
+
+void AagMonsterBase::SetInitMaxHpValue_Implementation(float maxValue)
+{
+}
+
 FVector AagMonsterBase::GetDamageableActorLocation() const
 {
 	return GetActorLocation();
@@ -105,6 +136,8 @@ void AagMonsterBase::DealDamage(float DamageAmount, AActor* DamageCauser)
 		return;
 	}
 	_playTakeDamage();
+	SetHpBarVisible( true );
+	_useHpBar = true;
 }
 
 void AagMonsterBase::DealTiredDamage(float DamageAmount, AActor* DamageCauser)
@@ -115,6 +148,7 @@ void AagMonsterBase::DealTiredDamage(float DamageAmount, AActor* DamageCauser)
 	_attribute.TiredGage -= DamageAmount;
 	if( _attribute.TiredGage <= 0 ){
 		// @todo 피로도 0 되면 뭐시기를 하겠지
+		// @todo 몇초간 틱뎀 그런 거
 	}
 }
 
@@ -149,8 +183,8 @@ void AagMonsterBase::_initAttribute()
 		return;
 	}
 	_attribute.state = EegMonsterState::Idle;
-	_attribute.HP = _extraData->InitHp;
-	_attribute.TiredGage = _extraData->InitTiredGage;
+	_attribute.HP = _extraData->MaxHp;
+	_attribute.TiredGage = _extraData->MaxTiredGage;
 	const auto gameMode = GetWorld()->GetAuthGameMode();
 	if( gameMode == nullptr ){
 		return;
@@ -160,6 +194,7 @@ void AagMonsterBase::_initAttribute()
 		return;
 	}
 	SetUID(again30GameMode->GetNewMonsterUID());
+	SetInitMaxHpValue(_extraData->MaxHp);
 }
 
 FVector AagMonsterBase::_getMonsterLocation(EagMonsterMovePointType pointType)
