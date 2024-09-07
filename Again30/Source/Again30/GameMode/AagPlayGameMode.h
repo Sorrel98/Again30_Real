@@ -47,9 +47,9 @@ private:
 	bool bNowDoingFishProduction;
 
 	/** 똥겜 특 : 브금 좋음 */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound" ,meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> NormalSounds; // 평범하고 아름다운 브금
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound" ,meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> FinalSound; // 격양된 브금
 
 	// Caching

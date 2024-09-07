@@ -8,7 +8,7 @@ AagAreaDamageWeaponBase::AagAreaDamageWeaponBase()
 	DamageOffset({0.f, 0.f, 0.f}),
 	DamageExtent({100.f, 100.f, 10.f}),
 	DamageInterval(3.f),
-	bDamageAreaActivated(false)
+	bDamageAreaActivated(true)
 {
 	PrimaryActorTick.bCanEverTick = true;	
 }
@@ -22,6 +22,7 @@ void AagAreaDamageWeaponBase::Tick(float DeltaSeconds)
 		ElapsedTime += DeltaSeconds;
 		if(ElapsedTime > DamageInterval)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("*** *** ** Call Damage"));
 			ElapsedTime = 0.f;
 			DealDamageToPlayer();
 		}	
@@ -59,20 +60,20 @@ void AagAreaDamageWeaponBase::ToggleDamageArea()
 
 void AagAreaDamageWeaponBase::DealDamageToPlayer()
 {
+	if(bShowBoxArea)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("*** *** ** Draw Box"));
+		DrawDebugBox(GetWorld(), GetActorLocation() + DamageOffset, DamageExtent,
+			FColor::Red, true, -1.f, 0, 5.f
+		);
+	}
+	
 	if(TargetMonster)
 	{
 		const FBox DamageAreaBox = FBox::BuildAABB(GetActorLocation() + DamageOffset, DamageExtent);
 		if(DamageAreaBox.IsInside(TargetMonster->GetDamageableActorLocation()))
 		{
 			DealDamageToTarget(TargetMonster.GetInterface());
-		}
-
-		if(bShowBoxArea)
-		{
-			//GetWorld()->FlushPersistentDebugLines();
-			DrawDebugBox(GetWorld(), GetActorLocation() + DamageOffset, DamageExtent,
-				FColor::Red, true, -1.f, 0, 5.f
-			);
 		}
 	}
 }

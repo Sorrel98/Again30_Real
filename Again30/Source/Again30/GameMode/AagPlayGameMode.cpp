@@ -22,7 +22,11 @@ AagPlayGameMode::AagPlayGameMode()
 	if( PlayerPawnBPClass.Class != NULL ){
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-	HUDClass = AagHUD::StaticClass();
+	static ConstructorHelpers::FClassFinder<AHUD> HUDClassFinder(TEXT("/Game/HUD/BP_AGHUD.BP_AGHUD_C"));
+	if(HUDClassFinder.Succeeded())
+	{
+		HUDClass = HUDClassFinder.Class;
+	}
 }
 
 void AagPlayGameMode::PostInitializeComponents()
