@@ -25,6 +25,9 @@ protected:
 	float MoveSpeedRate;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
 	float AttackAnimPlayRate;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
+	bool bPhysicsWeapon;
 	
 private:
 

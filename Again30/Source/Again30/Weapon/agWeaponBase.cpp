@@ -48,6 +48,13 @@ void AagWeaponBase::RemoveWeapon()
 		}
 		WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	}
+
+	if(bPhysicsWeapon)
+	{
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetNotifyRigidBodyCollision(true);
+		WeaponMesh->OnComponentHit.AddDynamic(this, &AagWeaponBase::OnWeaponHit);
+	}
 }
 
 void AagWeaponBase::DealDamageToTarget(IagDamageable* Target)
@@ -93,7 +100,10 @@ void AagWeaponBase::OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* Other
 {
 	if(bNowDoingAttack && bAttacked == false)
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, WeaponDamage, GetWorld()->GetFirstPlayerController(), GetOwner(), UDamageType::StaticClass());
-		bAttacked = true;
+		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
+		{
+			Damageable->DealDamage(WeaponDamage, this);
+			bAttacked = true;
+		}
 	}
 }
