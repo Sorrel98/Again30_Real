@@ -4,8 +4,6 @@
 #include "agMonsterMoveManager.h"
 
 #include "Again30/Monster/agMonsterBase.h"
-#include "Again30/Monster/agMonsterMovePoint.h"
-
 void UagMonsterMoveManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -21,25 +19,18 @@ void UagMonsterMoveManager::Tick(float elapsedTime)
 	}
 }
 
-void UagMonsterMoveManager::AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint)
+void UagMonsterMoveManager::PostCreated(TObjectPtr<class AagPlayGameMode> mode)
 {
-	if( movePoint == nullptr )
-	{
-		return;
-	}
-	if( _pointContainer.Contains(type) == true )
-	{
-		return;
-	}
-	_pointContainer.Add(type, movePoint);
+	Super::PostCreated(mode);
+	_playGameMode = mode;
 }
 
 bool UagMonsterMoveManager::GetMovePointLocation(EagMonsterMovePointType type, FVector& location)
 {
-	if( _pointContainer.Contains(type) == false ){
+	if( _playGameMode == nullptr ){
 		return false;
 	}
-	location = _pointContainer[type]->GetActorLocation();
+	_playGameMode->GetMovePointLocation(type, location);
 	return true;
 }
 

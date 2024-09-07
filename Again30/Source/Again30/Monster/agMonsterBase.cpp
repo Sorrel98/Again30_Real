@@ -28,13 +28,7 @@ void AagMonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if( _extraData == nullptr )
-	{
-		return;
-	}
 	_initMonster();
-	_initAction();
-	_initAttribute();
 }
 
 // Called every frame
@@ -42,7 +36,7 @@ void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if( _state != EegMonsterState::Moving ){
+	if( _attribute.state != EegMonsterState::Moving ){
 		if( _elapsedTime > 5 ){
 			MoveMonster(EagMonsterMovePointType::Bed);
 		}
@@ -60,43 +54,28 @@ void AagMonsterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AagMonsterBase::MoveMonster(EagMonsterMovePointType targetLocation)
 {
-	if( _state == EegMonsterState::Moving ){
-		return;
-	}
-	auto mode = GetWorld()->GetAuthGameMode();
-	if( mode == nullptr ){
-		return;
-	}
-	auto agMode = Cast<AagPlayGameMode>(mode);
-	if( agMode == nullptr ){
+	if( _attribute.state == EegMonsterState::Moving ){
 		return;
 	}
 	TObjectPtr<UagMonsterMoveManager> monsterMoveManager;
-	agMode->GetManager(EagManagerType::MonsterMove, monsterMoveManager);
+	if( _getMoveManger(monsterMoveManager) == false){
+		return;
+	}
 	if( monsterMoveManager == nullptr ){
 		return;
 	}
 	monsterMoveManager->RequestMoveToPoint(this, EagMonsterMovePointType::Bed, 3);
-	_state = EegMonsterState::Moving;
+	_attribute.state = EegMonsterState::Moving;
 }
 
 FVector AagMonsterBase::GetPointLocation(EagMonsterMovePointType locationPoint)
 {
-	auto mode = GetWorld()->GetAuthGameMode();
-	if( mode == nullptr ){
-		return FVector::ZeroVector;
-	}
-	auto agMode = Cast<AagPlayGameMode>(mode);
-	if( agMode == nullptr ){
-		return FVector::ZeroVector;
-	}
-	TObjectPtr<UagMonsterMoveManager> monsterMoveManager;
-	agMode->GetManager(EagManagerType::MonsterMove, monsterMoveManager);
-	if( monsterMoveManager == nullptr ){
+	TObjectPtr<class AagPlayGameMode> again30GameMode;
+	if( _getAgGameMode(again30GameMode) == false){
 		return FVector::ZeroVector;
 	}
 	FVector resultLocation = FVector::ZeroVector;
-	if( monsterMoveManager->GetMovePointLocation(locationPoint, resultLocation) == false ){
+	if( again30GameMode->GetMovePointLocation(locationPoint, resultLocation) == false ){
 		return FVector::ZeroVector;
 	}
 	return resultLocation;
@@ -104,20 +83,34 @@ FVector AagMonsterBase::GetPointLocation(EagMonsterMovePointType locationPoint)
 
 void AagMonsterBase::_initMonster()
 {
+	_initLocation();
+	_initAction();
+	_initAttribute();
+}
+
+void AagMonsterBase::_initLocation()
+{
+	if( _extraData == nullptr ){
+		return;
+	}
 	_setMonsterLocation( _getMonsterLocation(_extraData->InitSpawnMovePoint) );
 }
 
 void AagMonsterBase::_initAction()
 {
-	if( _action == nullptr )
-	{
+	if( _action == nullptr ){
 		_action = NewObject<UagMonsterActionBase>();
 	}
 }
 
 void AagMonsterBase::_initAttribute()
 {
-	_state = EegMonsterState::Idle;
+	if( _extraData == nullptr ){
+		return;
+	}
+	_attribute.state = EegMonsterState::Idle;
+	_attribute.HP = _extraData->InitHp;
+	_attribute.TiredGage = _extraData->InitTiredGage;
 	const auto gameMode = GetWorld()->GetAuthGameMode();
 	if( gameMode == nullptr ){
 		return;
@@ -131,27 +124,16 @@ void AagMonsterBase::_initAttribute()
 
 FVector AagMonsterBase::_getMonsterLocation(EagMonsterMovePointType pointType)
 {
-	if( GetWorld() != nullptr )
-	{
-		const auto gameMode = GetWorld()->GetAuthGameMode();
-		if( gameMode == nullptr ){
-			return FVector::ZeroVector;
-		}
-		const auto again30GameMode = Cast<AagPlayGameMode>(gameMode);
-		if( again30GameMode == nullptr ){
-			return FVector::ZeroVector;
-		}
-		TObjectPtr<UagMonsterMoveManager> manager = nullptr;
-		if( again30GameMode->GetManager(EagManagerType::MonsterMove, manager) == false ){
-			return FVector::ZeroVector;
-		}
-		if( manager == nullptr ){
-			return FVector::ZeroVector;
-		}
-		FVector location = FVector::ZeroVector;
-		if( manager->GetMovePointLocation(pointType, location) == true ){
-			return location;
-		}
+	TObjectPtr<class AagPlayGameMode> again30GameMode;
+	if( _getAgGameMode(again30GameMode) == false){
+		return FVector::ZeroVector;
+	}
+	if( again30GameMode == nullptr ){
+		return FVector::ZeroVector;
+	}
+	FVector location = FVector::ZeroVector;
+	if( again30GameMode->GetMovePointLocation(pointType, location) == true ){
+		return location;
 	}
 	return FVector::ZeroVector;
 }
@@ -159,4 +141,32 @@ FVector AagMonsterBase::_getMonsterLocation(EagMonsterMovePointType pointType)
 void AagMonsterBase::_setMonsterLocation(const FVector& location)
 {
 	SetActorLocation(location);
+}
+
+bool AagMonsterBase::_getMoveManger( TObjectPtr<class UagMonsterMoveManager>& manager )
+{
+	TObjectPtr<class AagPlayGameMode> again30GameMode = nullptr;
+	if( _getAgGameMode(again30GameMode) == false){
+		return false;
+	}
+	if( again30GameMode == nullptr ){
+		return false;
+	}
+	if( again30GameMode->GetManager(EagManagerType::MonsterMove, manager) == false ){
+		return false;
+	}
+	return true;
+}
+
+bool AagMonsterBase::_getAgGameMode( TObjectPtr<class AagPlayGameMode>& again30GameMode )
+{
+	if( GetWorld() == nullptr ){
+		return false;
+	}
+	const auto gameMode = GetWorld()->GetAuthGameMode();
+	if( gameMode == nullptr ){
+		return false;
+	}
+	again30GameMode = Cast<AagPlayGameMode>(gameMode);
+	return true;
 }

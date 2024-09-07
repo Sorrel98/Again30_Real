@@ -5,6 +5,8 @@
 #include "GameFramework/GameMode.h"
 #include "AagPlayGameMode.generated.h"
 
+class AagMonsterBase;
+class USoundCue;
 class AagFish;
 class APlayerStart;
 class AagPlayGameMode;
@@ -34,20 +36,38 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Rule" ,meta = (AllowPrivateAccess = true))
 	int32 CurGeneration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Production" ,meta = (AllowPrivateAccess = true))
+	float CameraAboveHeight;
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test" ,meta = (AllowPrivateAccess = true))
+	bool bDisableProduction;
+	
 	/** 현재 물고기 사망-스폰 연출 중인지 여부 */
 	bool bNowDoingFishProduction;
+
+	/** 똥겜 특 : 브금 좋음 */
+	UPROPERTY()
+	TObjectPtr<USoundCue> NormalSounds; // 평범하고 아름다운 브금
+	UPROPERTY()
+	TObjectPtr<USoundCue> FinalSound; // 격양된 브금
 
 	// Caching
 	UPROPERTY()
 	TObjectPtr<AagFish> CurrentFish;
 	UPROPERTY()
 	TObjectPtr<APlayerController> CurrentPlayController;
+	UPROPERTY()
+	TObjectPtr<ACameraActor> SpectatorCameraActor;
+	UPROPERTY()
+	TObjectPtr<AagMonsterBase> CurrentMonster;
 
 public:
 	AagPlayGameMode();
 	virtual void PostInitializeComponents() override;
 	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
+	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -74,15 +94,21 @@ public:
 		}
 		return false;
 	}
+	void PostCreateManager();
 
 	// Monster
 	int32 GetNewMonsterUID();
+	void RegisterMovePoint(EagMonsterMovePointType type, TObjectPtr<class AagMonsterMovePoint> movePoint);
+	void AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint);
+	bool GetMovePointLocation(EagMonsterMovePointType type, FVector& location);
 
 private:
 	void CalculateGenerationTime(float DeltaSeconds);
 	void SpawnFish();
 	APlayerStart* GetPlayerStartPoint();
 
+	/** 연출 카메라는 내가 집도한다 */
+	void SetProductionCamera(AagFish* FishPawn);
 	/** 물고기 사망 연출이 끝난 뒤 불리게 될 함수 */
 	void OnFishDeadProductionEnd();
 	/** 물고기 스폰 연출이 끝난 뒤 불리게 될 함수 */
@@ -103,6 +129,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class AagMonsterBase> _monster = nullptr;
 	UPROPERTY()
-	TArray<TObjectPtr<class AagMonsterMovePoint>> _movePointContainer;
+	TMap<EagMonsterMovePointType, TObjectPtr<class AagMonsterMovePoint>> _pointContainer;
 	int32 _monsterUID = 1;
 };
