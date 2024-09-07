@@ -1,6 +1,8 @@
 ﻿#include "agWeaponBase.h"
 
 #include "Again30/agInterfaces/agDamageable.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -8,7 +10,8 @@ AagWeaponBase::AagWeaponBase()
 	:
 	WeaponDamage(0.f), WeaponTiredDamage(0.f),
 	WeaponAttachSocketName(TEXT("WeaponAttach")),
-	bNowDoingAttack(true)
+	bNowDoingAttack(true),
+	MoveSpeedRate(1.f), AttackAnimPlayRate(1.f)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -27,12 +30,22 @@ void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName 
 	{
 		WeaponMesh->AttachToComponent(SkeletalToAttach, AttachmentRules, AttackSocketName);
 	}
+	ACharacter* OwnerCharacter =  Cast<ACharacter>(SkeletalToAttach->GetOwner());
+	if(OwnerCharacter)
+	{
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedRate;
+	}
 }
 
 void AagWeaponBase::RemoveWeapon()
 {
 	if(WeaponMesh)
 	{
+		ACharacter* OwnerCharacter =  Cast<ACharacter>(WeaponMesh->GetAttachmentRoot()->GetOwner());
+		if(OwnerCharacter)
+		{
+			OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed /= MoveSpeedRate;
+		}
 		WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	}
 }

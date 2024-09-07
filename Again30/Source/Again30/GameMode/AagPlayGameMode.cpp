@@ -148,6 +148,8 @@ void AagPlayGameMode::GenerationEnd()
 	{
 		FInputModeUIOnly InputModeUIOnly;
 		PlayerController->SetInputMode(InputModeUIOnly);
+
+		PlayerController->FlushPressedKeys();
 	}
 }
 
