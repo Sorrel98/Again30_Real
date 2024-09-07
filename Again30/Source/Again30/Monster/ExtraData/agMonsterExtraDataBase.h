@@ -16,9 +16,9 @@ class AGAIN30_API UagMonsterExtraDataBase : public UDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster", meta=(ClampMin = 0))
-	float InitHp = 0.f;
+	float MaxHp = 0.f;
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster", meta=(ClampMin = 0))
-	float InitTiredGage = 0.f;
+	float MaxTiredGage = 0.f;
 	
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Spawn")
 	EagMonsterMovePointType InitSpawnMovePoint = EagMonsterMovePointType::None;
@@ -27,4 +27,7 @@ public:
 	FSoftObjectPath TakeDamageMontage;
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Anim")
 	FSoftObjectPath CorpseMontage;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Ui")
+	float HpBarShowTime = 0.f;
 };

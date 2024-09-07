@@ -57,6 +57,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EegMonsterState GetState();
 	void SetState( EegMonsterState state );
+	UFUNCTION(BlueprintCallable, BlueprintType, Blueprintable)
+	float GetHp();
+	UFUNCTION(BlueprintNativeEvent)
+	void SetHpBarVisible( bool isVisible );
+	UFUNCTION(BlueprintNativeEvent)
+	void SetInitMaxHpValue( float maxValue );
 	
 	// IagDamageable
 	virtual FVector GetDamageableActorLocation() const override;
@@ -64,6 +70,7 @@ public:
 	virtual void DealTiredDamage(float DamageAmount, AActor* DamageCauser) override;
 
 protected:
+	// init
 	void _initMonster();
 	void _initLocation();
 	void _initAction();
@@ -92,4 +99,11 @@ protected:
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
+
+	// hp bar
+	UPROPERTY()
+	TObjectPtr<UUserWidget> _hpBar = nullptr;
+	float _elapsedTime = 0.f; // @todo remove
+	bool _useHpBar = false;
+	float _hpBarShow_ElapsedTime = 0.f;
 };
