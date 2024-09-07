@@ -5,6 +5,7 @@
 
 #include "Again30/GameMode/AagPlayGameMode.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
+#include "Animation/agAnimInstance.h"
 #include "Animation/agMonsterActionBase.h"
 #include "ExtraData/agMonsterExtraDataBase.h"
 
@@ -35,15 +36,7 @@ void AagMonsterBase::BeginPlay()
 void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if( _played == false){
-		if( _elapsedTime > 10 ){
-			_action->PlayMontage(this, _extraData->TakeDamageMontage);
-		}
-		else{
-			_elapsedTime += DeltaTime;
-		}
-	}
+	
 }
 
 // Called to bind functionality to input
@@ -111,18 +104,7 @@ void AagMonsterBase::DealDamage(float DamageAmount, AActor* DamageCauser)
 		_monsterDead();
 		return;
 	}
-	// action montage
-	const auto& mesh = GetMesh();
-	if( mesh == nullptr ){
-		return;
-	}
-	const auto animInstance = mesh->GetAnimInstance();
-	if( animInstance == nullptr ){
-		return;
-	}
-	if( animInstance->IsAnyMontagePlaying() == false ){
-		_action->PlayMontage(this, _extraData->TakeDamageMontage);
-	}
+	_playTakeDamage();
 }
 
 void AagMonsterBase::DealTiredDamage(float DamageAmount, AActor* DamageCauser)
@@ -237,4 +219,21 @@ void AagMonsterBase::_monsterDead()
 	}
 	SetState(EegMonsterState::Corpse);
 	again30GameMode->FishWin();
+}
+
+void AagMonsterBase::_playTakeDamage()
+{
+	const auto& mesh = GetMesh();
+	if( mesh == nullptr ){
+		return;
+	}
+	const auto animInstance = mesh->GetAnimInstance();
+	if( animInstance == nullptr ){
+		return;
+	}
+	const auto agAnimInstance = Cast<UagAnimInstance>( animInstance );
+	if( agAnimInstance == nullptr){
+		return;
+	}
+	agAnimInstance->PlayTakeDamageMontage();
 }

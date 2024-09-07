@@ -203,10 +203,13 @@ void AagFish::Move(const FInputActionValue& Value)
 		// add movement
 		if (bReadyToHop)
 		{
-			FVector Impulse = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X + FVector(0.f, 0.f, 0.25f);
+			FVector Impulse = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X;
+			Impulse.Normalize();
+			
+			Impulse += FVector(0.f, 0.f, HopHeight);
 			if (!GetCharacterMovement()->IsFalling())
 			{
-				LaunchCharacter(Impulse * 500, true, true);
+				LaunchCharacter(Impulse * HopForce, true, true);
 			}
 			bReadyToHop = false;
 		}
