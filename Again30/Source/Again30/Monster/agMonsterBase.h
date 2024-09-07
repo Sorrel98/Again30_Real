@@ -14,7 +14,7 @@ enum class EegMonsterState :uint8
 {
 	None,
 	Idle,
-	Moving,
+	Walking,
 	Max
 };
 
@@ -49,6 +49,11 @@ public:
 	virtual void MoveMonster( EagMonsterMovePointType targetLocation );
 	FVector GetPointLocation( EagMonsterMovePointType locationPoint );
 
+	UFUNCTION(BlueprintCallable)
+	EegMonsterState GetState();
+	void SetState( EegMonsterState state );
+
+	void MoveFinish();
 
 protected:
 	void _initMonster();

@@ -35,15 +35,6 @@ void AagMonsterBase::BeginPlay()
 void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if( _attribute.state != EegMonsterState::Moving ){
-		if( _elapsedTime > 5 ){
-			MoveMonster(EagMonsterMovePointType::Bed);
-		}
-		else{
-			_elapsedTime += DeltaTime;
-		}
-	}
 }
 
 // Called to bind functionality to input
@@ -54,7 +45,7 @@ void AagMonsterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AagMonsterBase::MoveMonster(EagMonsterMovePointType targetLocation)
 {
-	if( _attribute.state == EegMonsterState::Moving ){
+	if( _attribute.state == EegMonsterState::Walking ){
 		return;
 	}
 	TObjectPtr<UagMonsterMoveManager> monsterMoveManager;
@@ -65,7 +56,7 @@ void AagMonsterBase::MoveMonster(EagMonsterMovePointType targetLocation)
 		return;
 	}
 	monsterMoveManager->RequestMoveToPoint(this, EagMonsterMovePointType::Bed, 3);
-	_attribute.state = EegMonsterState::Moving;
+	_attribute.state = EegMonsterState::Walking;
 }
 
 FVector AagMonsterBase::GetPointLocation(EagMonsterMovePointType locationPoint)
@@ -81,11 +72,28 @@ FVector AagMonsterBase::GetPointLocation(EagMonsterMovePointType locationPoint)
 	return resultLocation;
 }
 
+EegMonsterState AagMonsterBase::GetState()
+{
+	return _attribute.state;
+}
+
+void AagMonsterBase::SetState(EegMonsterState state)
+{
+	_attribute.state = state;
+}
+
+void AagMonsterBase::MoveFinish()
+{
+	SetState( EegMonsterState::Idle );
+}
+
 void AagMonsterBase::_initMonster()
 {
 	_initLocation();
 	_initAction();
 	_initAttribute();
+	
+	MoveMonster(EagMonsterMovePointType::Bed);
 }
 
 void AagMonsterBase::_initLocation()
