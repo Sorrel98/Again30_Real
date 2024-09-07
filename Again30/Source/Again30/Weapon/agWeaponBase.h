@@ -44,6 +44,7 @@ public:
 	
 	void WeaponAttackStart();
 	void WeaponAttackEnd();
+
 protected:
 	virtual void BeginPlay() override;
 
