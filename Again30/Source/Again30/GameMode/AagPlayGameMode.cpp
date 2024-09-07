@@ -5,6 +5,7 @@
 #include "Again30/Monster/agMonsterBase.h"
 #include "Again30/Fish/agFish.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
+#include "Again30/Monster/agMonsterMovePoint.h"
 #include "Camera/CameraActor.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
@@ -38,6 +39,7 @@ void AagPlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	SpectatorCameraActor = GetWorld()->SpawnActor<ACameraActor>(ACameraActor::StaticClass());
 
 	if(CurrentMonster == nullptr)
@@ -63,6 +65,7 @@ void AagPlayGameMode::BeginPlay()
 		}
 	}
 
+
 	GameStart();
 }
 
@@ -70,6 +73,10 @@ void AagPlayGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	float PrevTime = CurGenerationTime;
+	CurGenerationTime -= DeltaSeconds;
+
+	_managerTick( DeltaSeconds );
 	CalculateGenerationTime(DeltaSeconds);
 }
 
@@ -159,6 +166,40 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 	return false;
 }
 
+void AagPlayGameMode::PostCreateManager()
+{
+}
+
+int32 AagPlayGameMode::GetNewMonsterUID()
+{
+	++_monsterUID;
+	return _monsterUID - 1;
+}
+
+void AagPlayGameMode::RegisterMovePoint(EagMonsterMovePointType type, TObjectPtr<class AagMonsterMovePoint> movePoint)
+{
+	_pointContainer.Add(type, movePoint);
+}
+
+void AagPlayGameMode::AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint)
+{
+	if( movePoint == nullptr ){
+		return;
+	}
+	if( _pointContainer.Contains(type) == true ){
+		return;
+	}
+	_pointContainer.Add(type, movePoint);
+}
+
+bool AagPlayGameMode::GetMovePointLocation(EagMonsterMovePointType type, FVector& location)
+{
+	if( _pointContainer.Contains(type) == false ){
+		return false;
+	}
+	location = _pointContainer[type]->GetActorLocation();
+	return true;
+}
 
 void AagPlayGameMode::SetProductionCamera(AagFish* FishPawn)
 {
@@ -265,6 +306,7 @@ void AagPlayGameMode::_setManagerContainer()
 			if( newManagerObject != nullptr )
 			{
 				newManagerObject->BeginPlay();
+				newManagerObject->PostCreated( this );
 				_managerContainer.Add( managerType, newManagerObject );
 			}
 		}
@@ -282,4 +324,14 @@ TObjectPtr<UagManagerBase> AagPlayGameMode::_createManager(EagManagerType type)
 	default: ;
 	}
 	return newManager;
+}
+
+void AagPlayGameMode::_managerTick(float elapsedTime)
+{
+	for( auto& manager : _managerContainer ){
+		if( manager.Value == nullptr ){
+			continue;
+		}
+		manager.Value->Tick(elapsedTime);
+	}
 }

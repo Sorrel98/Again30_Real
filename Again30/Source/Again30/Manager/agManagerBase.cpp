@@ -6,3 +6,11 @@
 void UagManagerBase::BeginPlay()
 {
 }
+
+void UagManagerBase::Tick(float DeltaTime)
+{
+}
+
+void UagManagerBase::PostCreated(TObjectPtr<class AagPlayGameMode> mode)
+{
+}

@@ -13,24 +13,7 @@ AagMonsterMovePoint::AagMonsterMovePoint()
 void AagMonsterMovePoint::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if( GetWorld() == nullptr )
-	{
-		return;
-	}
-	const auto gameMode = Cast<AagPlayGameMode>(GetWorld()->GetAuthGameMode());
-	if( gameMode != nullptr )
-	{
-		TObjectPtr<UagManagerBase> manager = nullptr;
-		if( gameMode->GetManager(EagManagerType::MonsterMove, manager) == true )
-		{
-			TObjectPtr<UagMonsterMoveManager> moveManager = Cast<UagMonsterMoveManager>(manager);
-			if( moveManager != nullptr )
-			{
-				moveManager->AddMonsterMovePoint(_pointType, this);
-			}
-		}
-	}
+	_registerContainer();
 }
 
 void AagMonsterMovePoint::Tick(float DeltaTime)
@@ -43,3 +26,12 @@ EagMonsterMovePointType AagMonsterMovePoint::GetType()
 	return _pointType;
 }
 
+bool AagMonsterMovePoint::_registerContainer()
+{
+	const auto gameMode = Cast<AagPlayGameMode>(GetWorld()->GetAuthGameMode());
+	if( gameMode == nullptr ){
+		return true;
+	}
+	gameMode->RegisterMovePoint(_pointType, this);
+	return false;
+}

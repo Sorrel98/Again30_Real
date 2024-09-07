@@ -56,21 +56,40 @@ private:
 
 	/** Jump Property */
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MaxJumpHoldTime;
 
 	float CurrentJumpHoldTime;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MaxJumpHeight;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MinJumpHeight;
+
+	/** Hopping Property */
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float HopHeight;
+
+	UPROPERTY(EditAnywhere)
+	float HopForce;
+
+	UPROPERTY(EditAnywhere)
+	float HopRate;
+
+	bool bReadyToHop;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bIsJumping = false;
 
 public:
 	// Sets default values for this character's properties
+
+	AagFish(FObjectInitializer const& ObjectInitializer = FObjectInitializer::Get());
+
 	AagFish();
 	virtual void UnPossessed() override;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -83,12 +102,14 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	void SetReadyToHop();
 	/** 연출이 있기 전 실험용 타이머로 망할 연출을 제어하도록 하마 (나는 연출의 마법사가 될꺼야) */
 	FTimerHandle TestTimerHandler;
 	void PlayFishSpawnProduction();
 	void PlayFishDeadProduction();
 	void OnSpawnProductionEnd();
 	void OnDeadProductionEnd();
+
 
 protected:
 
@@ -97,6 +118,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	virtual void Jump() override;
 
 	void JumpStart();
 

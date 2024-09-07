@@ -3,33 +3,67 @@
 
 #include "agMonsterMoveManager.h"
 
-#include "Again30/Monster/agMonsterMovePoint.h"
-
+#include "Again30/Monster/agMonsterBase.h"
 void UagMonsterMoveManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-void UagMonsterMoveManager::AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint)
+void UagMonsterMoveManager::Tick(float elapsedTime)
 {
-	if( movePoint == nullptr )
-	{
-		return;
+	Super::Tick(elapsedTime);
+
+	if( _movingContainer.IsEmpty() == false ){
+		_move(elapsedTime);
 	}
-	if( _pointContainer.Contains(type) == true )
-	{
-		return;
-	}
-	_pointContainer.Add(type, movePoint);
+}
+
+void UagMonsterMoveManager::PostCreated(TObjectPtr<class AagPlayGameMode> mode)
+{
+	Super::PostCreated(mode);
+	_playGameMode = mode;
 }
 
 bool UagMonsterMoveManager::GetMovePointLocation(EagMonsterMovePointType type, FVector& location)
 {
-	if( _pointContainer.Contains(type) == false )
-	{
+	if( _playGameMode == nullptr ){
 		return false;
 	}
-	location = _pointContainer[type]->GetActorLocation();
+	_playGameMode->GetMovePointLocation(type, location);
 	return true;
+}
+
+void UagMonsterMoveManager::RequestMoveToPoint(const TObjectPtr<class AagMonsterBase>& monster, EagMonsterMovePointType pointType, float duration)
+{
+	if( monster == nullptr ){
+		return;
+	}
+	FvMonsterMoveData newData = FvMonsterMoveData();
+	if( GetMovePointLocation( pointType, newData._movingEndLocation ) == false ){
+		return;
+	}
+	newData._movingStartLocation = monster->GetActorLocation();
+	newData._movingMonster = monster;
+	newData._movingTotalTime = duration;
+	_movingContainer.Add( monster->GetUID(), newData);
+}
+
+void UagMonsterMoveManager::_move(float elapsedTime)
+{
+	for( auto iterator = _movingContainer.CreateIterator(); iterator; ++iterator ){
+		auto& movingData = iterator.Value();
+		if( movingData._movingElapsedTime >= movingData._movingTotalTime ){
+			iterator.RemoveCurrent();
+		}
+		if( movingData._movingMonster == nullptr ){
+			continue;
+		}
+		movingData._movingMonster->SetActorLocation(FMath::Lerp(movingData._movingStartLocation,
+																movingData._movingEndLocation,
+																FMath::Clamp(
+																	movingData._movingElapsedTime / movingData.
+																	_movingTotalTime, 0, 1)));
+		movingData._movingElapsedTime += elapsedTime;
+	}
 }
