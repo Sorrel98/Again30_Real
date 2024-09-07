@@ -100,6 +100,8 @@ public:
 
 	void MultiplyHopForce(float Factor);
 
+	FORCEINLINE AagWeaponBase* GetCurrentWeapon() const { return Weapon; }
+
 
 protected:
 	// Called when the game starts or when spawned
