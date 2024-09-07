@@ -84,7 +84,7 @@ private:
 
 public:
 	// Sets default values for this character's properties
-	AagFish(FObjectInitializer const& ObjectInitializer = FObjectInitializer::Get());
+	AagFish(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// Called when the game starts or when spawned
