@@ -3,6 +3,8 @@
 
 #include "agMonsterMoveManager.h"
 
+#include <ThirdParty/hlslcc/hlslcc/src/hlslcc_lib/cclist.h>
+
 #include "Again30/Monster/agMonsterBase.h"
 void UagMonsterMoveManager::BeginPlay()
 {
@@ -54,7 +56,10 @@ void UagMonsterMoveManager::_move(float elapsedTime)
 	for( auto iterator = _movingContainer.CreateIterator(); iterator; ++iterator ){
 		auto& movingData = iterator.Value();
 		if( movingData._movingElapsedTime >= movingData._movingTotalTime ){
+			movingData._movingMonster->MoveFinish();
+			movingData._movingMonster = nullptr;
 			iterator.RemoveCurrent();
+			continue;
 		}
 		if( movingData._movingMonster == nullptr ){
 			continue;
