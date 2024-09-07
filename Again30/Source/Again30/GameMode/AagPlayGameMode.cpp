@@ -5,6 +5,7 @@
 #include "Again30/Monster/agMonsterBase.h"
 #include "Again30/Fish/agFish.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
+#include "Again30/Monster/agMonsterMovePoint.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -36,24 +37,6 @@ APawn* AagPlayGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlaye
 void AagPlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// @todo 야매
-	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
-	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
-	if ( _extraData != nullptr ){
-		for ( auto managerType : _extraData->ManagerList ){
-			if ( managerType == EagManagerType::None ){
-				continue;
-			}
-			// @todo factory패턴으로 하고 싶었다.
-			auto newManagerObject = _createManager(managerType);
-			if (newManagerObject != nullptr)
-			{
-				newManagerObject->BeginPlay();
-				_managerContainer.Add(managerType, newManagerObject);
-			}
-		}
-	}
 
 	GameStart();
 }
@@ -152,11 +135,39 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 	return false;
 }
 
+void AagPlayGameMode::PostCreateManager()
+{
+}
 
 int32 AagPlayGameMode::GetNewMonsterUID()
 {
 	++_monsterUID;
 	return _monsterUID - 1;
+}
+
+void AagPlayGameMode::RegisterMovePoint(EagMonsterMovePointType type, TObjectPtr<class AagMonsterMovePoint> movePoint)
+{
+	_pointContainer.Add(type, movePoint);
+}
+
+void AagPlayGameMode::AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint)
+{
+	if( movePoint == nullptr ){
+		return;
+	}
+	if( _pointContainer.Contains(type) == true ){
+		return;
+	}
+	_pointContainer.Add(type, movePoint);
+}
+
+bool AagPlayGameMode::GetMovePointLocation(EagMonsterMovePointType type, FVector& location)
+{
+	if( _pointContainer.Contains(type) == false ){
+		return false;
+	}
+	location = _pointContainer[type]->GetActorLocation();
+	return true;
 }
 
 void AagPlayGameMode::SpawnFish()
@@ -233,6 +244,7 @@ void AagPlayGameMode::_setManagerContainer()
 			if( newManagerObject != nullptr )
 			{
 				newManagerObject->BeginPlay();
+				newManagerObject->PostCreated( this );
 				_managerContainer.Add( managerType, newManagerObject );
 			}
 		}

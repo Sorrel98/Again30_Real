@@ -19,6 +19,8 @@ public:
 	virtual EagMonsterMovePointType GetType();
 
 protected:
+	bool _registerContainer();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30")
 	EagMonsterMovePointType _pointType = EagMonsterMovePointType::None;
 };

@@ -16,4 +16,5 @@ class AGAIN30_API UagManagerBase : public UObject
 public:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime);
+	virtual void PostCreated(TObjectPtr<class AagPlayGameMode> mode);
 };
