@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "agWeaponBase.generated.h"
 
+class IagDamageable;
 class UStaticMeshComponent;
 
 UCLASS()
@@ -13,11 +14,17 @@ class AGAIN30_API AagWeaponBase : public AActor
 {
 	GENERATED_BODY()
 
-private:
+protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
 	float WeaponDamage;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
 	float WeaponTiredDamage;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
+	bool bAttackHP;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
+	bool bAttackTired;
+	
+private:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Mesh", meta=(AllowPrivateAccess=true))
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
@@ -32,6 +39,8 @@ public:
 
 	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName);
 	virtual void RemoveWeapon();
+
+	virtual void DealDamageToTarget(IagDamageable* Target);
 	
 	void WeaponAttackStart();
 	void WeaponAttackEnd();

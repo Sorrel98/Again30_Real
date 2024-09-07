@@ -1,10 +1,31 @@
 ﻿#include "AagAreaDamageWeaponBase.h"
+#include "Again30/agInterfaces/agDamageable.h"
+#include "Again30/Monster/agMonsterBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AagAreaDamageWeaponBase::AagAreaDamageWeaponBase()
 	:
-	bToggleDamageArea(false)
+	DamageOffset({0.f, 0.f, 0.f}),
+	DamageExtent({100.f, 100.f, 10.f}),
+	DamageInterval(3.f),
+	bDamageAreaActivated(false)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;	
+}
+
+void AagAreaDamageWeaponBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(bDamageAreaActivated)
+	{
+		ElapsedTime += DeltaSeconds;
+		if(ElapsedTime > DamageInterval)
+		{
+			ElapsedTime = 0.f;
+			DealDamageToPlayer();
+		}	
+	}
 }
 
 void AagAreaDamageWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName)
@@ -24,9 +45,34 @@ void AagAreaDamageWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if(TargetMonster == nullptr)
+	{
+		TargetMonster = Cast<AagMonsterBase>(UGameplayStatics::GetActorOfClass(GetWorld(), AagMonsterBase::StaticClass()));
+	}
+	
 }
 
 void AagAreaDamageWeaponBase::ToggleDamageArea()
 {
-	bToggleDamageArea = !bToggleDamageArea;
+	bDamageAreaActivated = !bDamageAreaActivated;
+}
+
+void AagAreaDamageWeaponBase::DealDamageToPlayer()
+{
+	if(TargetMonster)
+	{
+		const FBox DamageAreaBox = FBox::BuildAABB(GetActorLocation() + DamageOffset, DamageExtent);
+		if(DamageAreaBox.IsInside(TargetMonster->GetDamageableActorLocation()))
+		{
+			DealDamageToTarget(TargetMonster.GetInterface());
+		}
+
+		if(bShowBoxArea)
+		{
+			//GetWorld()->FlushPersistentDebugLines();
+			DrawDebugBox(GetWorld(), GetActorLocation() + DamageOffset, DamageExtent,
+				FColor::Red, true, -1.f, 0, 5.f
+			);
+		}
+	}
 }

@@ -5,6 +5,7 @@
 #include "AagAreaDamageWeaponBase.generated.h"
 
 class UBoxComponent;
+class IagDamageable;
 
 UCLASS()
 class AGAIN30_API AagAreaDamageWeaponBase : public AagWeaponBase
@@ -13,12 +14,25 @@ class AGAIN30_API AagAreaDamageWeaponBase : public AagWeaponBase
 
 private:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
-	TObjectPtr<UBoxComponent> DamageArea;
+	FVector DamageOffset;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
+	FVector DamageExtent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
+	float DamageInterval;
+	float ElapsedTime;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
+	bool bShowBoxArea;
 
-	bool bToggleDamageArea;
+	bool bDamageAreaActivated;
+
+	// Caching
+	UPROPERTY()
+	TScriptInterface<IagDamageable> TargetMonster;
 	
 public:
 	AagAreaDamageWeaponBase();
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName) override;
 	virtual void RemoveWeapon() override;
@@ -28,5 +42,5 @@ protected:
 
 private:
 	void ToggleDamageArea();
-	
+	void DealDamageToPlayer();
 };
