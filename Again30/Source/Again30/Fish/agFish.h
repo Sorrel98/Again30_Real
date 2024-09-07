@@ -48,20 +48,35 @@ class AGAIN30_API AagFish : public ACharacter
 
 	/** Jump Property */
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MaxJumpHoldTime;
 
 	float CurrentJumpHoldTime;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MaxJumpHeight;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Jump")
 	float MinJumpHeight;
+
+	/** Hopping Property */
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float HopHeight;
+
+	UPROPERTY(EditAnywhere)
+	float HopForce;
+
+	UPROPERTY(EditAnywhere)
+	float HopRate;
+
+	bool bReadyToHop;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bIsJumping = false;
 
 public:
 	// Sets default values for this character's properties
-	AagFish();
+	AagFish(FObjectInitializer const& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// Called when the game starts or when spawned
@@ -74,6 +89,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	void SetReadyToHop();
+
 protected:
 
 	/** Called for movement input */
@@ -81,6 +98,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	virtual void Jump() override;
 
 	void JumpStart();
 

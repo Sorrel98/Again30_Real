@@ -2,6 +2,8 @@
 
 
 #include "agFish.h"
+
+#include "agFishMovement.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -12,7 +14,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
-AagFish::AagFish()
+AagFish::AagFish(FObjectInitializer const& ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UagFishMovement>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -30,7 +33,7 @@ AagFish::AagFish()
 	// instead of recompiling to adjust them
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = 200.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -50,6 +53,8 @@ AagFish::AagFish()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+
+
 void AagFish::BeginPlay()
 {
 	// Call the base class  
@@ -63,6 +68,9 @@ void AagFish::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AagFish::SetReadyToHop, HopRate, true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,6 +102,12 @@ void AagFish::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	CurrentJumpHoldTime += DeltaSeconds;
+	
+}
+
+void AagFish::SetReadyToHop()
+{
+	bReadyToHop = true;
 }
 
 void AagFish::Move(const FInputActionValue& Value)
@@ -113,7 +127,16 @@ void AagFish::Move(const FInputActionValue& Value)
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
+		// add movement
+		if (bReadyToHop)
+		{
+			FVector Impulse = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X + FVector(0.f, 0.f, 0.25f);
+			if (!GetMovementComponent()->IsFalling())
+			{
+				LaunchCharacter(Impulse * 500, true, true);
+			}
+			bReadyToHop = false;
+		}
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
@@ -132,18 +155,26 @@ void AagFish::Look(const FInputActionValue& Value)
 	}
 }
 
+void AagFish::Jump()
+{
+	Super::Jump();
+	bIsJumping = true;
+}
+
 void AagFish::JumpStart()
 {
 	CurrentJumpHoldTime = 0.0f;
-	if (!GetMovementComponent()->IsFalling())
-	{
-		K2_OnJumpStart();
-	}
+	K2_OnJumpStart();
 }
 
 void AagFish::JumpEnd()
 {
 	GetCharacterMovement()->JumpZVelocity = FMath::Lerp(MinJumpHeight, MaxJumpHeight, FMath::Clamp(CurrentJumpHoldTime / MaxJumpHoldTime, 0.0f, 1.0f));
-	Jump();
+
+	if (!bIsJumping)
+	{
+		Jump();
+	}
 	K2_OnJumpEnd();
 }
+
