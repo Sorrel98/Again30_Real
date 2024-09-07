@@ -80,15 +80,15 @@ protected:
 	// dead
 	void _monsterDead();
 
+	// monatge
+	void _playTakeDamage();
+
 	int32 _uid = 0;
 
 	UPROPERTY(EditAnywhere, Blueprintable, BlueprintReadWrite, Category="Again30")
 	TObjectPtr<class UagMonsterExtraDataBase> _extraData;
 	UPROPERTY()
 	TObjectPtr<class UagMonsterActionBase> _action = nullptr;
-
-	float _elapsedTime = 0.f;
-	bool _played = false;
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
