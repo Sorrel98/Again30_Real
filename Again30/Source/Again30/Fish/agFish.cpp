@@ -53,6 +53,21 @@ AagFish::AagFish(FObjectInitializer const& ObjectInitializer)
 }
 
 
+void AagFish::UnPossessed()
+{
+	Super::UnPossessed();
+
+	if (InputComponent)
+	{
+		InputComponent->ClearActionBindings();
+	}
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent != nullptr)
+	{
+		MovementComponent->ResetMoveState();
+		MovementComponent->StopMovementImmediately();
+	}
+}
 
 void AagFish::BeginPlay()
 {
