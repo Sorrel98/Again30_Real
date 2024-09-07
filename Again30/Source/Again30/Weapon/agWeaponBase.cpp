@@ -7,7 +7,8 @@
 AagWeaponBase::AagWeaponBase()
 	:
 	WeaponDamage(0.f), WeaponTiredDamage(0.f),
-	WeaponAttachSocketName(TEXT("WeaponAttach"))
+	WeaponAttachSocketName(TEXT("WeaponAttach")),
+	bNowDoingAttack(true)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
