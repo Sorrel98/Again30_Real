@@ -76,6 +76,11 @@ void AagFish::UnPossessed()
 	}
 }
 
+void AagFish::MultiplyHopForce(float Factor)
+{
+	HopForce *= Factor;
+}
+
 void AagFish::BeginPlay()
 {
 	// Call the base class  

@@ -7,9 +7,11 @@
 #include "Again30/HUD/agHUD.h"
 #include "Again30/Monster/agMonsterMovePoint.h"
 #include "Camera/CameraActor.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/HUD.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 AagPlayGameMode::AagPlayGameMode()
 	:
@@ -26,6 +28,25 @@ AagPlayGameMode::AagPlayGameMode()
 	if(HUDClassFinder.Succeeded())
 	{
 		HUDClass = HUDClassFinder.Class;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<USoundCue> NormalSoundFinder(TEXT("/Game/Sound/BGM/NormalBGM/SoundCue_NormalBGM.SoundCue_NormalBGM"));
+	if (NormalSoundFinder.Succeeded())
+	{
+		NormalSound = NormalSoundFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> FinalSoundFinder(TEXT("/Game/Sound/BGM/FinalBGM/SoundCue_FinalBGM.SoundCue_FinalBGM"));
+	if (FinalSoundFinder.Succeeded())
+	{
+		FinalSound = FinalSoundFinder.Object;
+	}
+
+	BGMComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("BGMComponent"));
+	if(BGMComponent)
+	{
+		BGMComponent->bAutoActivate = false;
+		BGMComponent->SetVolumeMultiplier(1.0f);
 	}
 }
 
@@ -127,7 +148,11 @@ void AagPlayGameMode::GenerationEnd()
 	{
 		FInputModeUIOnly InputModeUIOnly;
 		PlayerController->SetInputMode(InputModeUIOnly);
+
+		PlayerController->FlushPressedKeys();
 	}
+
+	OnGenerationEndEvent.Broadcast();
 }
 
 void AagPlayGameMode::IncreaseGeneration()
@@ -247,6 +272,7 @@ void AagPlayGameMode::SpawnFish()
 	}
 
 	SetProductionCamera(FishPawn);
+	PlayBGMSoundByHPPercentage();
 }
 
 void AagPlayGameMode::OnFishDeadProductionEnd()
@@ -266,6 +292,27 @@ void AagPlayGameMode::OnFishSpawnProductionEnd()
 	}
 	
 	GenerationStart();
+}
+
+void AagPlayGameMode::PlayBGMSoundByHPPercentage()
+{
+	// TODO : 
+	bool bPlayFinalBGM = false;
+	USoundCue* PlaySoundCue = bPlayFinalBGM ? FinalSound : NormalSound;
+	if(BGMComponent)
+	{
+		if(BGMComponent->IsPlaying())
+		{
+			if(BGMComponent->Sound != PlaySoundCue)
+			{
+				BGMComponent->FadeOut(1.0f, 0.0f);		
+			}
+			return;
+		}
+		BGMComponent->SetSound(PlaySoundCue);
+		BGMComponent->FadeOut(1.0f, 1.0f);	
+	}
+	BGMComponent->Play();
 }
 
 APlayerStart* AagPlayGameMode::GetPlayerStartPoint()
