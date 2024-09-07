@@ -3,6 +3,7 @@
 
 #include "agMonsterActionBase.h"
 
+#include "agAnimInstance.h"
 #include "Again30/Monster/agMonsterBase.h"
 
 void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, TObjectPtr<UAnimMontage> montage)
@@ -18,7 +19,11 @@ void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& m
 	if( animInstance == nullptr ){
 		return;
 	}
-	animInstance->Montage_Play(montage);
+	const auto agAnimInstance = Cast<UagAnimInstance>( animInstance );
+	if( agAnimInstance == nullptr){
+		return;
+	}
+	agAnimInstance->PlayTakeDamageMontage();
 }
 
 void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, const FSoftObjectPath montagePath)
