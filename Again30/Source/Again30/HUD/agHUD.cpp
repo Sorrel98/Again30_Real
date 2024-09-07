@@ -1,5 +1,6 @@
 #include "agHUD.h"
 #include "Again30/GameMode/AagPlayGameMode.h"
+#include "Again30/GameMode/agGameModeExtraData.h"
 #include "Components/SlateWrapperTypes.h"
 #include "MainPlay/agMainPlayWidget.h"
 
@@ -48,5 +49,10 @@ void AagHUD::BindWidgetDelegates()
 		GameMode->OnCurrentTimeChanged.AddUObject(this, &AagHUD::SetGameTimeText);
 		GameMode->OnGenerationChanged.AddUObject(this, &AagHUD::SetGenerationText);
 		GameMode->OnGameEndEvent.AddUObject(this, &AagHUD::SetWinText);
+
+		// generation time 초기값 셋팅
+		if( GameMode->GetExtraData() ){
+			SetGameTimeText( GameMode->GetExtraData()->GenerationTime );
+		}
 	}
 }

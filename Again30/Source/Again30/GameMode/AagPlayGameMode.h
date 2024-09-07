@@ -34,7 +34,7 @@ private:
 	float CurGenerationTime;
 	/** 현재 몇 세대인지 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Rule" ,meta = (AllowPrivateAccess = true))
-	int32 CurGeneration;
+	int32 CurGeneration = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Production" ,meta = (AllowPrivateAccess = true))
 	float CameraAboveHeight;
@@ -76,6 +76,9 @@ public:
 	void GenerationEnd();
 	void IncreaseGeneration();
 	void FishWin();
+
+	// Get
+	const TObjectPtr<class UagGameModeExtraData>& GetExtraData();
 
 	// Manager
 	bool GetManager(EagManagerType type, TObjectPtr<class UagManagerBase>& manager);

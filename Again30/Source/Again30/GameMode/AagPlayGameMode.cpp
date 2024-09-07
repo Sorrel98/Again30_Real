@@ -13,7 +13,7 @@
 
 AagPlayGameMode::AagPlayGameMode()
 	:
-	GenerationTime(10.f), CurGeneration(0), CameraAboveHeight(400.f)
+	GenerationTime(10.f), CurGeneration(1), CameraAboveHeight(400.f)
 {
 	CurGenerationTime = GenerationTime;
 
@@ -57,6 +57,10 @@ void AagPlayGameMode::BeginPlay()
 	if(CurrentMonster == nullptr)
 	{
 		CurrentMonster = Cast<AagMonsterBase>(UGameplayStatics::GetActorOfClass(GetWorld(), AagMonsterBase::StaticClass()));
+	}
+
+	if( _extraData ){
+		GenerationTime = _extraData->GenerationTime;
 	}
 	
 	GameStart();
@@ -107,7 +111,6 @@ void AagPlayGameMode::GenerationStart()
 	UE_LOG(LogTemp, Warning, TEXT("*** *** *** Generation Start"));
 	bNowDoingFishProduction = false;
 	CurGenerationTime = GenerationTime;
-	IncreaseGeneration();
 }
 
 void AagPlayGameMode::GenerationEnd()
@@ -147,6 +150,11 @@ void AagPlayGameMode::FishWin()
 	}
 
 	OnGameEndEvent.Broadcast();
+}
+
+const TObjectPtr<class UagGameModeExtraData>& AagPlayGameMode::GetExtraData()
+{
+	return _extraData;
 }
 
 bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>& manager )
@@ -251,6 +259,12 @@ void AagPlayGameMode::SpawnFish()
 
 void AagPlayGameMode::OnFishDeadProductionEnd()
 {
+	{ //@todo 여기 UI 폴리싱 했어요
+		IncreaseGeneration();
+		if( _extraData != nullptr ){
+			OnCurrentTimeChanged.Broadcast(_extraData->GenerationTime);
+		}
+	}
 	SpawnFish();
 }
 
