@@ -39,6 +39,7 @@ void AagHUD::SetWinText()
 	if(MainPlayGameWidget)
 	{
 		MainPlayGameWidget->SetWinText();
+		MainPlayGameWidget->GameEnd();
 	}
 }
 

@@ -22,6 +22,8 @@ private:
 	TObjectPtr<UOverlay> GameEndOverlay;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void GameEnd();
 	void SetGameTimeText(float CurrentGameTime);
 	void SetGenerationText(int32 Generation);
 	void SetWinText();
