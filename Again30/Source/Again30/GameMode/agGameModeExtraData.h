@@ -17,4 +17,7 @@ class AGAIN30_API UagGameModeExtraData : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30|Mangers")
 	TArray<EagManagerType> ManagerList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30|Fish")
+	float GenerationTime = 0.f;
 };
