@@ -35,6 +35,15 @@ void AagMonsterBase::BeginPlay()
 void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if( _played == false){
+		if( _elapsedTime > 10 ){
+			_action->PlayMontage(this, _extraData->TakeDamageMontage);
+		}
+		else{
+			_elapsedTime += DeltaTime;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -123,7 +132,7 @@ void AagMonsterBase::_initMonster()
 	_initAction();
 	_initAttribute();
 
-	MoveMonster(EagMonsterMovePointType::Bed);
+	//MoveMonster(EagMonsterMovePointType::Bed);
 	//TakeDamage(10000);
 }
 

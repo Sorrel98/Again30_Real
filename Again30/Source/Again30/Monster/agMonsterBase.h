@@ -87,6 +87,7 @@ protected:
 	TObjectPtr<class UagMonsterActionBase> _action = nullptr;
 
 	float _elapsedTime = 0.f;
+	bool _played = false;
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
