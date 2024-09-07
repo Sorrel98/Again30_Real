@@ -72,6 +72,11 @@ FVector AagMonsterBase::GetPointLocation(EagMonsterMovePointType locationPoint)
 	return resultLocation;
 }
 
+void AagMonsterBase::MoveFinish()
+{
+	SetState( EegMonsterState::Idle );
+}
+
 EegMonsterState AagMonsterBase::GetState()
 {
 	return _attribute.state;
@@ -82,9 +87,26 @@ void AagMonsterBase::SetState(EegMonsterState state)
 	_attribute.state = state;
 }
 
-void AagMonsterBase::MoveFinish()
+void AagMonsterBase::_monsterDead()
 {
-	SetState( EegMonsterState::Idle );
+	TObjectPtr<AagPlayGameMode> again30GameMode = nullptr;
+	if( _getAgGameMode(again30GameMode) == false ){
+		return;
+	}
+	SetState(EegMonsterState::Corpse);
+	again30GameMode->FishWin();
+}
+
+float AagMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if( _attribute.HP <= 0 ){
+		return 0.f;
+	}
+	_attribute.HP -= Damage;
+	if( _attribute.HP <= 0 ){
+		_monsterDead();
+	}
+	return 0.f;
 }
 
 void AagMonsterBase::_initMonster()
