@@ -96,18 +96,17 @@ void AagMonsterBase::SetState(EegMonsterState state)
 	_attribute.state = state;
 }
 
-float AagMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+FVector AagMonsterBase::GetDamageableActorLocation() const
 {
-	TakeDamage(Damage);
-	return Damage;
+	return GetActorLocation();
 }
 
-void AagMonsterBase::TakeDamage(float damage)
+void AagMonsterBase::DealDamage(float DamageAmount, AActor* DamageCauser)
 {
 	if( _attribute.HP <= 0 ){
 		return;
 	}
-	_attribute.HP -= damage;
+	_attribute.HP -= DamageAmount;
 	if( _attribute.HP <= 0 ){
 		_monsterDead();
 		return;
@@ -123,6 +122,17 @@ void AagMonsterBase::TakeDamage(float damage)
 	}
 	if( animInstance->IsAnyMontagePlaying() == false ){
 		_action->PlayMontage(this, _extraData->TakeDamageMontage);
+	}
+}
+
+void AagMonsterBase::DealTiredDamage(float DamageAmount, AActor* DamageCauser)
+{
+	if( _attribute.TiredGage <= 0 ){
+		return;
+	}
+	_attribute.TiredGage -= DamageAmount;
+	if( _attribute.TiredGage <= 0 ){
+		// @todo 피로도 0 되면 뭐시기를 하겠지
 	}
 }
 
