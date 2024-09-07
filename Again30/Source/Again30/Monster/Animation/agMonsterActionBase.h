@@ -15,7 +15,7 @@ class AGAIN30_API UagMonsterActionBase : public UObject
 	GENERATED_BODY()
 public:
 	void PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, TObjectPtr<UAnimMontage> montage);
-	void PlayMontage( const TObjectPtr<class AagMonsterBase>& monster, const FSoftObjectPath montagePath );
+	void PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, const FSoftObjectPath montagePath);
 
 protected:
 	

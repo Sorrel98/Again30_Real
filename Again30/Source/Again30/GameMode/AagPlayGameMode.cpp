@@ -4,9 +4,10 @@
 #include "Again30/Manager/agMonsterMoveManager.h"
 #include "Again30/Monster/agMonsterBase.h"
 #include "Again30/Fish/agFish.h"
-#include "Again30/Manager/agMonsterMoveManager.h"
+#include "Again30/HUD/agHUD.h"
 #include "Again30/Monster/agMonsterMovePoint.h"
 #include "Camera/CameraActor.h"
+#include "GameFramework/HUD.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,6 +16,13 @@ AagPlayGameMode::AagPlayGameMode()
 	GenerationTime(10.f), CurGeneration(0), CameraAboveHeight(400.f)
 {
 	CurGenerationTime = GenerationTime;
+
+	// set default pawn class to our Blueprinted character
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Characters/Fish/B_Fish"));
+	if( PlayerPawnBPClass.Class != NULL ){
+		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+	HUDClass = AagHUD::StaticClass();
 }
 
 void AagPlayGameMode::PostInitializeComponents()
@@ -46,26 +54,7 @@ void AagPlayGameMode::BeginPlay()
 	{
 		CurrentMonster = Cast<AagMonsterBase>(UGameplayStatics::GetActorOfClass(GetWorld(), AagMonsterBase::StaticClass()));
 	}
-
-	// @todo 야매
-	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
-	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
-	if ( _extraData != nullptr ){
-		for ( auto managerType : _extraData->ManagerList ){
-			if ( managerType == EagManagerType::None ){
-				continue;
-			}
-			// @todo factory패턴으로 하고 싶었다.
-			auto newManagerObject = _createManager(managerType);
-			if (newManagerObject != nullptr)
-			{
-				newManagerObject->BeginPlay();
-				_managerContainer.Add(managerType, newManagerObject);
-			}
-		}
-	}
-
-
+	
 	GameStart();
 }
 

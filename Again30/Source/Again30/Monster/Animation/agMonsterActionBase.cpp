@@ -7,18 +7,15 @@
 
 void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, TObjectPtr<UAnimMontage> montage)
 {
-	if( monster == nullptr || montage == nullptr )
-	{
+	if( monster == nullptr || montage == nullptr ){
 		return;
 	}
 	const auto& mesh = monster->GetMesh();
-	if( mesh == nullptr )
-	{
+	if( mesh == nullptr ){
 		return;
 	}
 	const auto animInstance = mesh->GetAnimInstance();
-	if( animInstance == nullptr )
-	{
+	if( animInstance == nullptr ){
 		return;
 	}
 	animInstance->Montage_Play(montage);
@@ -26,19 +23,16 @@ void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& m
 
 void UagMonsterActionBase::PlayMontage(const TObjectPtr<class AagMonsterBase>& monster, const FSoftObjectPath montagePath)
 {
-	if( monster == nullptr || montagePath.IsValid() == false )
-	{
+	if( monster == nullptr || montagePath.IsValid() == false ){
 		return;
 	}
 	auto loadedObject = montagePath.TryLoad();
-	if( loadedObject == nullptr )
-	{
+	if( loadedObject == nullptr ){
 		return;
 	}
-	TObjectPtr<UAnimMontage> animMontage = Cast<UAnimMontage>( loadedObject );
-	if( animMontage == nullptr )
-	{
+	TObjectPtr<UAnimMontage> animMontage = Cast<UAnimMontage>(loadedObject);
+	if( animMontage == nullptr ){
 		return;
 	}
-	PlayMontage( monster, animMontage);
+	PlayMontage(monster, animMontage);
 }

@@ -56,10 +56,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EegMonsterState GetState();
 	void SetState( EegMonsterState state );
-	void _monsterDead();
 
 	// damage
+	// @todo 현재는 Damage float 값만 필요함
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	void TakeDamage( float damage );
 
 protected:
 	void _initMonster();
@@ -74,6 +75,9 @@ protected:
 	// get
 	bool _getAgGameMode(TObjectPtr<class AagPlayGameMode>& again30GameMode);
 	bool _getMoveManger(TObjectPtr<class UagMonsterMoveManager>& manager);
+	
+	// dead
+	void _monsterDead();
 
 	int32 _uid = 0;
 
@@ -83,6 +87,7 @@ protected:
 	TObjectPtr<class UagMonsterActionBase> _action = nullptr;
 
 	float _elapsedTime = 0.f;
+	bool _played = false;
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
