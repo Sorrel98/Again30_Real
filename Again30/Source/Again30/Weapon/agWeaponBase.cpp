@@ -21,9 +21,11 @@ AagWeaponBase::AagWeaponBase()
 
 void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName)
 {
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+
 	if(WeaponMesh && SkeletalToAttach)
 	{
-		WeaponMesh->AttachToComponent(SkeletalToAttach, FAttachmentTransformRules::KeepRelativeTransform, AttackSocketName);
+		WeaponMesh->AttachToComponent(SkeletalToAttach, AttachmentRules, AttackSocketName);
 	}
 }
 
