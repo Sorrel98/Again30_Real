@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "agFish.generated.h"
 
+class AagWeaponBase;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -87,6 +88,10 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bIsJumping = false;
 
+	/** Weapon **/
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	AagWeaponBase* Weapon;
+
 public:
 	// Sets default values for this character's properties
 	AagFish(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
@@ -126,6 +131,9 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Attack();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Attack", DisplayName = "DefaultAttack")
+	void K2_DefaultAttack();
 
 	void Interact();
 

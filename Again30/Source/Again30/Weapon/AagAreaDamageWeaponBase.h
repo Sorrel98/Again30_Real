@@ -35,7 +35,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName) override;
+	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName, ACharacter* Character) override;
 	virtual void RemoveWeapon() override;
 
 protected:

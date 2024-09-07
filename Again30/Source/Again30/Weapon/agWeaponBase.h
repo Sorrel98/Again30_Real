@@ -31,19 +31,29 @@ private:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Mesh", meta=(AllowPrivateAccess=true))
 	FName WeaponAttachSocketName;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	UAnimMontage* AttackMontage;
+
 	bool bNowDoingAttack;
 	bool bAttacked;
 	
 public:
 	AagWeaponBase();
 
-	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName);
+	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName, ACharacter* Character);
 	virtual void RemoveWeapon();
 
 	virtual void DealDamageToTarget(IagDamageable* Target);
-	
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void WeaponAttackStart();
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void WeaponAttackEnd();
+
+	UFUNCTION(BlueprintImplementableEvent, Category="Weapon")
+	void DoAttack();
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,4 +62,6 @@ private:
 	UFUNCTION()
 	virtual void OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess=true))
+	ACharacter* OwnerCharacter;
 };

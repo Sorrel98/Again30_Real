@@ -233,10 +233,25 @@ void AagFish::Look(const FInputActionValue& Value)
 
 void AagFish::Attack()
 {
+	if (Weapon)
+	{
+		Weapon->DoAttack();
+	}
+	else
+	{
+		
+	}
 }
 
 void AagFish::Interact()
 {
+	if (Weapon)
+	{
+		Weapon->RemoveWeapon();
+		Weapon = nullptr;
+		return;
+	}
+	
 	if (UWorld* World = GetWorld())
 	{
 		TArray<FOverlapResult> Overlaps;
@@ -257,10 +272,11 @@ void AagFish::Interact()
 		float Distance;
 		AActor* NearestActor = UGameplayStatics::FindNearestActor(GetActorLocation(), OverlappedActors, Distance);
 		
-		AagWeaponBase* Weapon = Cast<AagWeaponBase>(NearestActor);
-		if (Weapon)
+		AagWeaponBase* NearestWeapon = Cast<AagWeaponBase>(NearestActor);
+		if (NearestWeapon)
 		{
-			Weapon->EquipWeapon(GetMesh(), FName(TEXT("Socket_Mouse")));
+			Weapon = NearestWeapon;
+			NearestWeapon->EquipWeapon(GetMesh(), FName(TEXT("Socket_Mouse")), this);
 		}
 	}
 }
