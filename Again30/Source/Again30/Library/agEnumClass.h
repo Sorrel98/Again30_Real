@@ -20,3 +20,6 @@ enum class EagManagerType :uint8
 	MonsterMove,
 	Max
 };
+
+#define ag_ObjectChannel_Fish	ECC_GameTraceChannel1
+#define ag_ObjectChannel_Weapon	ECC_GameTraceChannel2

@@ -242,10 +242,6 @@ void AagFish::Attack()
 	{
 		Weapon->DoAttack();
 	}
-	else
-	{
-		
-	}
 }
 
 void AagFish::Interact()
@@ -260,11 +256,11 @@ void AagFish::Interact()
 	if (UWorld* World = GetWorld())
 	{
 		TArray<FOverlapResult> Overlaps;
-		World->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity,
-			FCollisionObjectQueryParams(ECC_WorldDynamic), FCollisionShape::MakeSphere(200.f));
+		const bool bIsOverlaped = World->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity,
+			FCollisionObjectQueryParams(ag_ObjectChannel_Weapon), FCollisionShape::MakeSphere(200.f));
 
 		TArray<AActor*> OverlappedActors;
-		if (Overlaps.Num() > 0)
+		if (bIsOverlaped)
 		{
 			for (FOverlapResult& Overlap : Overlaps)
 			{
