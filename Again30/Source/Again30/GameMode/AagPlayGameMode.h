@@ -48,7 +48,7 @@ private:
 
 	/** 똥겜 특 : 브금 좋음 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound" ,meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundCue> NormalSounds; // 평범하고 아름다운 브금
+	TObjectPtr<USoundCue> NormalSound; // 평범하고 아름다운 브금
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound" ,meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> FinalSound; // 격양된 브금
 
@@ -61,6 +61,8 @@ private:
 	TObjectPtr<ACameraActor> SpectatorCameraActor;
 	UPROPERTY()
 	TObjectPtr<AagMonsterBase> CurrentMonster;
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> BGMComponent;
 
 public:
 	AagPlayGameMode();
@@ -113,6 +115,8 @@ private:
 	void OnFishDeadProductionEnd();
 	/** 물고기 스폰 연출이 끝난 뒤 불리게 될 함수 */
 	void OnFishSpawnProductionEnd();
+
+	void PlayBGMSoundByHPPercentage();
 	
 protected:
 	// manager

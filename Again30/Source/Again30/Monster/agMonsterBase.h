@@ -92,4 +92,6 @@ protected:
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
+
+	FORCEINLINE bool IsHPUnderPercentage(const float Percentage) { return false; }
 };
