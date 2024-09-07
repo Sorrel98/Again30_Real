@@ -124,6 +124,8 @@ protected:
 
 	void Attack();
 
+	void Interact();
+
 	virtual void Jump() override;
 
 	void JumpStart();

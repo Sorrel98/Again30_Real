@@ -14,6 +14,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Again30/GameMode/AagPlayGameMode.h"
+#include "Again30/Weapon/agWeaponBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // : Super(ObjectInitializer.SetDefaultSubobjectClass<UagFishMovementComponent>(ACharacter::CharacterMovementComponentName))
 
@@ -112,6 +114,9 @@ void AagFish::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Attacking
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AagFish::Attack);
+
+		// Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AagFish::Interact);
 	}
 	else
 	{
@@ -223,6 +228,36 @@ void AagFish::Look(const FInputActionValue& Value)
 
 void AagFish::Attack()
 {
+}
+
+void AagFish::Interact()
+{
+	if (UWorld* World = GetWorld())
+	{
+		TArray<FOverlapResult> Overlaps;
+		World->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity,
+			FCollisionObjectQueryParams(ECC_WorldDynamic), FCollisionShape::MakeSphere(200.f));
+
+		TArray<AActor*> OverlappedActors;
+		if (Overlaps.Num() > 0)
+		{
+			for (FOverlapResult& Overlap : Overlaps)
+			{
+				if (AActor* TargetActor = Overlap.GetActor())
+				{
+					OverlappedActors.AddUnique(TargetActor);
+				}
+			}
+		}
+		float Distance;
+		AActor* NearestActor = UGameplayStatics::FindNearestActor(GetActorLocation(), OverlappedActors, Distance);
+		
+		AagWeaponBase* Weapon = Cast<AagWeaponBase>(NearestActor);
+		if (Weapon)
+		{
+			Weapon->EquipWeapon(GetMesh(), FName(TEXT("Socket_Mouse")));
+		}
+	}
 }
 
 void AagFish::Jump()
