@@ -110,6 +110,50 @@ void AagFish::SetReadyToHop()
 	bReadyToHop = true;
 }
 
+void AagFish::PlayFishSpawnProduction()
+{
+	if(GetMesh())
+	{
+		GetMesh()->bPauseAnims = true;
+	}
+
+	if(GetWorld())
+	{
+		FTimerDelegate TimerENdDelegate;
+		TimerENdDelegate.BindUObject(this, &AagFish::OnSpawnProductionEnd);
+		GetWorld()->GetTimerManager().SetTimer(TestTimerHandler, TimerENdDelegate, 2.f, false);
+	}
+}
+
+void AagFish::PlayFishDeadProduction()
+{
+	if(GetMesh())
+	{
+		GetMesh()->bPauseAnims = true;
+	}
+
+	if(GetWorld())
+	{
+		FTimerDelegate TimerENdDelegate;
+		TimerENdDelegate.BindUObject(this, &AagFish::OnDeadProductionEnd);
+		GetWorld()->GetTimerManager().SetTimer(TestTimerHandler, TimerENdDelegate, 2.f, false);
+	}
+}
+
+void AagFish::OnSpawnProductionEnd()
+{
+	if(GetMesh())
+	{
+		GetMesh()->bPauseAnims = false;
+	}
+	OnFishSpawnProductionEnd.Broadcast();
+}
+
+void AagFish::OnDeadProductionEnd()
+{
+	OnFishDeadProductionEnd.Broadcast();
+}
+
 void AagFish::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D

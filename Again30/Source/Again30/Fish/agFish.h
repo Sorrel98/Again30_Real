@@ -12,10 +12,18 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+DECLARE_EVENT(AagFish, FFishEvent);
+
 UCLASS()
 class AGAIN30_API AagFish : public ACharacter
 {
 	GENERATED_BODY()
+
+public:
+	FFishEvent OnFishSpawnProductionEnd;
+	FFishEvent OnFishDeadProductionEnd;
+	
+private:
 	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -90,6 +98,13 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void SetReadyToHop();
+	/** 연출이 있기 전 실험용 타이머로 망할 연출을 제어하도록 하마 (나는 연출의 마법사가 될꺼야) */
+	FTimerHandle TestTimerHandler;
+	void PlayFishSpawnProduction();
+	void PlayFishDeadProduction();
+	void OnSpawnProductionEnd();
+	void OnDeadProductionEnd();
+
 
 protected:
 
