@@ -99,6 +99,10 @@ void AagWeaponBase::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
 		{
+			if(WeaponHitSoundCue)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponHitSoundCue, GetActorLocation(), FRotator::ZeroRotator, HitVolumeMultiplier);
+			}
 			Damageable->DealDamage(WeaponDamage, this);
 			bAttacked = true;
 		}

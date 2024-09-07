@@ -103,7 +103,9 @@ protected:
 	// hp bar
 	UPROPERTY()
 	TObjectPtr<UUserWidget> _hpBar = nullptr;
-	float _elapsedTime = 0.f; // @todo remove
 	bool _useHpBar = false;
 	float _hpBarShow_ElapsedTime = 0.f;
+	bool _tickDam = false;
+	float _tickDam_ElapsedTime = 0.f;
+	float _tickDam_TotalElapsedTime = 0.f;
 };

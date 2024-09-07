@@ -30,20 +30,15 @@ void AagMonsterBase::BeginPlay()
 	Super::BeginPlay();
 
 	_initMonster();
+
+	DealTiredDamage( 101, this );
 }
 
 // Called every frame
 void AagMonsterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// @todo remove monster hp bar test
-	_elapsedTime += DeltaTime;
-	if( _elapsedTime >= 1 ){
-		_attribute.HP -= 1;
-		_elapsedTime = 0;
-	}
-
+	
 	if( _extraData == nullptr ){
 		return;
 	}
@@ -53,6 +48,19 @@ void AagMonsterBase::Tick(float DeltaTime)
 			SetHpBarVisible( false );
 			_hpBarShow_ElapsedTime = 0;
 			_useHpBar = false;
+		}
+	}
+	if( _tickDam == true ){
+		_tickDam_ElapsedTime += DeltaTime;
+		_tickDam_TotalElapsedTime += DeltaTime;
+		if( _tickDam_ElapsedTime >= 1 ){
+			_tickDam_ElapsedTime = 0.f;
+			_attribute.HP -= _extraData->TickDam;
+		}
+		if( _tickDam_TotalElapsedTime >= _extraData->TickDamTime){
+			_tickDam_ElapsedTime = 0;
+			_tickDam_TotalElapsedTime = 0;
+			_tickDam = false;
 		}
 	}
 }
@@ -147,8 +155,7 @@ void AagMonsterBase::DealTiredDamage(float DamageAmount, AActor* DamageCauser)
 	}
 	_attribute.TiredGage -= DamageAmount;
 	if( _attribute.TiredGage <= 0 ){
-		// @todo 피로도 0 되면 뭐시기를 하겠지
-		// @todo 몇초간 틱뎀 그런 거
+		_tickDam = true;
 	}
 }
 

@@ -30,4 +30,9 @@ public:
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Ui")
 	float HpBarShowTime = 0.f;
+	
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|TiredDamage")
+	float TickDamTime = 0.f;
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|TiredDamage")
+	float TickDam = 0.f;
 };
