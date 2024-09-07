@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Again30/agInterfaces/agDamageable.h"
 #include "Again30/GameMode/AagPlayGameMode.h"
 #include "Again30/Library/agEnumClass.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
@@ -34,7 +35,7 @@ struct FvMonsterAttribute
 
 
 UCLASS()
-class AGAIN30_API AagMonsterBase : public ACharacter
+class AGAIN30_API AagMonsterBase : public ACharacter, public IagDamageable
 {
 	GENERATED_BODY()
 
@@ -56,11 +57,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EegMonsterState GetState();
 	void SetState( EegMonsterState state );
-
-	// damage
-	// @todo 현재는 Damage float 값만 필요함
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-	void TakeDamage( float damage );
+	
+	// IagDamageable
+	virtual FVector GetDamageableActorLocation() const override;
+	virtual void DealDamage(float DamageAmount, AActor* DamageCauser) override;
+	virtual void DealTiredDamage(float DamageAmount, AActor* DamageCauser) override;
 
 protected:
 	void _initMonster();
