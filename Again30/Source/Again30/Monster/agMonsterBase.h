@@ -15,6 +15,7 @@ enum class EegMonsterState :uint8
 	None,
 	Idle,
 	Walking,
+	Corpse,
 	Max
 };
 
@@ -44,16 +45,21 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	
+
+	// movement
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void MoveMonster( EagMonsterMovePointType targetLocation );
 	FVector GetPointLocation( EagMonsterMovePointType locationPoint );
+	void MoveFinish();
 
+	// state
 	UFUNCTION(BlueprintCallable)
 	EegMonsterState GetState();
 	void SetState( EegMonsterState state );
+	void _monsterDead();
 
-	void MoveFinish();
+	// damage
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	void _initMonster();
