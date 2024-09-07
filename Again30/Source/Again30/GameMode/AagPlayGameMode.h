@@ -52,6 +52,24 @@ public:
 
 	// Manager
 	bool GetManager(EagManagerType type, TObjectPtr<class UagManagerBase>& manager);
+	template <typename MangerClassName>
+	bool GetManager(EagManagerType type, TObjectPtr<MangerClassName>& manager)
+	{
+		TObjectPtr<UagManagerBase> managerbase;
+		if( GetManager(type, managerbase) == false)
+		{
+			return false;
+		}
+		if( managerbase != nullptr )
+		{
+			manager = Cast<MangerClassName>(managerbase);
+			return true;
+		}
+		return false;
+	}
+
+	// Monster
+	int32 GetNewMonsterUID();
 
 private:
 	void SpawnFish();
@@ -62,6 +80,7 @@ protected:
 	// manager
 	void _setManagerContainer();
 	TObjectPtr<class UagManagerBase> _createManager(EagManagerType type);
+	void _managerTick(float elapsedTime);
 	
 	UPROPERTY()
 	TObjectPtr<class UagGameModeExtraData> _extraData = nullptr;
@@ -71,7 +90,7 @@ protected:
 	// monster
 	UPROPERTY()
 	TObjectPtr<class AagMonsterBase> _monster = nullptr;
-
 	UPROPERTY()
 	TArray<TObjectPtr<class AagMonsterMovePoint>> _movePointContainer;
+	int32 _monsterUID = 1;
 };

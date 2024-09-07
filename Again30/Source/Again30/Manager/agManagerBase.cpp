@@ -6,3 +6,7 @@
 void UagManagerBase::BeginPlay()
 {
 }
+
+void UagManagerBase::Tick(float DeltaTime)
+{
+}
