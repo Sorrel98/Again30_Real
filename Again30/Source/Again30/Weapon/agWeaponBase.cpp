@@ -36,6 +36,11 @@ void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName 
 	{
 		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedRate;
 	}
+
+	if(bPhysicsWeapon)
+	{
+		bAttacked = false;
+	}
 }
 
 void AagWeaponBase::RemoveWeapon()
@@ -107,12 +112,12 @@ void AagWeaponBase::BeginPlay()
 	{
 		if (bPhysicsWeapon)
 		{
-			WeaponMesh->OnComponentHit.AddDynamic(this, &AagWeaponBase::OnWeaponHit);
 			WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 		}
 		else
 		{
 			WeaponMesh->OnComponentBeginOverlap.AddDynamic(this, &AagWeaponBase::OnWeaponOverlap);
+			WeaponMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		}
 		
 	}
@@ -121,7 +126,7 @@ void AagWeaponBase::BeginPlay()
 void AagWeaponBase::OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(bNowDoingAttack && bAttacked == false)
+	if(bPhysicsWeapon && bAttacked == false)
 	{
 		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
 		{
