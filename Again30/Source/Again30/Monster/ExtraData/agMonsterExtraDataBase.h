@@ -17,4 +17,7 @@ class AGAIN30_API UagMonsterExtraDataBase : public UDataAsset
 public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Spawn")
 	EagMonsterMovePointType InitSpawnMovePoint = EagMonsterMovePointType::None;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category="Again30|Monster|Anim")
+	FSoftObjectPath MoveAnim;
 };

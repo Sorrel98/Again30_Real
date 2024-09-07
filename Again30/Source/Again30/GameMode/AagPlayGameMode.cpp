@@ -62,6 +62,10 @@ void AagPlayGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	float PrevTime = CurGenerationTime;
+	CurGenerationTime -= DeltaSeconds;
+
+	_managerTick( DeltaSeconds );
 	CalculateGenerationTime(DeltaSeconds);
 }
 
@@ -148,6 +152,12 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 	return false;
 }
 
+
+int32 AagPlayGameMode::GetNewMonsterUID()
+{
+	++_monsterUID;
+	return _monsterUID - 1;
+}
 
 void AagPlayGameMode::SpawnFish()
 {
@@ -240,4 +250,14 @@ TObjectPtr<UagManagerBase> AagPlayGameMode::_createManager(EagManagerType type)
 	default: ;
 	}
 	return newManager;
+}
+
+void AagPlayGameMode::_managerTick(float elapsedTime)
+{
+	for( auto& manager : _managerContainer ){
+		if( manager.Value == nullptr ){
+			continue;
+		}
+		manager.Value->Tick(elapsedTime);
+	}
 }
