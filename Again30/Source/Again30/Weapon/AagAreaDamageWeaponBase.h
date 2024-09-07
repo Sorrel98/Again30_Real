@@ -19,10 +19,11 @@ private:
 	FVector DamageExtent;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
 	float DamageInterval;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
 	float ElapsedTime;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
 	bool bShowBoxArea;
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Damage Area", meta=(AllowPrivateAccess=true))
 	bool bDamageAreaActivated;
 
 	// Caching

@@ -7,7 +7,8 @@
 AagWeaponBase::AagWeaponBase()
 	:
 	WeaponDamage(0.f), WeaponTiredDamage(0.f),
-	WeaponAttachSocketName(TEXT("WeaponAttach"))
+	WeaponAttachSocketName(TEXT("WeaponAttach")),
+	bNowDoingAttack(true)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -20,9 +21,11 @@ AagWeaponBase::AagWeaponBase()
 
 void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName)
 {
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+
 	if(WeaponMesh && SkeletalToAttach)
 	{
-		WeaponMesh->AttachToComponent(SkeletalToAttach, FAttachmentTransformRules::KeepRelativeTransform, AttackSocketName);
+		WeaponMesh->AttachToComponent(SkeletalToAttach, AttachmentRules, AttackSocketName);
 	}
 }
 
