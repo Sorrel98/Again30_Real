@@ -3,7 +3,7 @@
 
 #include "agFish.h"
 
-#include "agFishMovement.h"
+#include "agFishMovementComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -13,8 +13,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Again30/GameMode/AagPlayGameMode.h"
 
-AagFish::AagFish(FObjectInitializer const& ObjectInitializer)
+// : Super(ObjectInitializer.SetDefaultSubobjectClass<UagFishMovementComponent>(ACharacter::CharacterMovementComponentName))
+
+
+AagFish::AagFish(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UagFishMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -53,6 +58,21 @@ AagFish::AagFish(FObjectInitializer const& ObjectInitializer)
 }
 
 
+void AagFish::UnPossessed()
+{
+	Super::UnPossessed();
+
+	if (InputComponent)
+	{
+		InputComponent->ClearActionBindings();
+	}
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent != nullptr)
+	{
+		MovementComponent->ResetMoveState();
+		MovementComponent->StopMovementImmediately();
+	}
+}
 
 void AagFish::BeginPlay()
 {
@@ -174,7 +194,7 @@ void AagFish::Move(const FInputActionValue& Value)
 		if (bReadyToHop)
 		{
 			FVector Impulse = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X + FVector(0.f, 0.f, 0.25f);
-			if (!GetMovementComponent()->IsFalling())
+			if (!GetCharacterMovement()->IsFalling())
 			{
 				LaunchCharacter(Impulse * 500, true, true);
 			}
