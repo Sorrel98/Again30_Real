@@ -4,8 +4,10 @@
 #include "Again30/Manager/agMonsterMoveManager.h"
 #include "Again30/Monster/agMonsterBase.h"
 #include "Again30/Fish/agFish.h"
+#include "Again30/HUD/agHUD.h"
 #include "Again30/Monster/agMonsterMovePoint.h"
 #include "Camera/CameraActor.h"
+#include "GameFramework/HUD.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,6 +16,13 @@ AagPlayGameMode::AagPlayGameMode()
 	GenerationTime(10.f), CurGeneration(0), CameraAboveHeight(400.f)
 {
 	CurGenerationTime = GenerationTime;
+
+	// set default pawn class to our Blueprinted character
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Characters/Fish/B_Fish"));
+	if( PlayerPawnBPClass.Class != NULL ){
+		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+	HUDClass = AagHUD::StaticClass();
 }
 
 void AagPlayGameMode::PostInitializeComponents()
