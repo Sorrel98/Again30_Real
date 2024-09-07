@@ -1,5 +1,6 @@
 ﻿#include "agWeaponBase.h"
 
+#include "Again30/agInterfaces/agDamageable.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -30,6 +31,22 @@ void AagWeaponBase::RemoveWeapon()
 	if(WeaponMesh)
 	{
 		WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	}
+}
+
+void AagWeaponBase::DealDamageToTarget(IagDamageable* Target)
+{
+	if(Target)
+	{
+		if(bAttackHP)
+		{
+			Target->DealDamage(WeaponDamage, this);
+		}
+
+		if(bAttackTired)
+		{
+			Target->DealTiredDamage(WeaponTiredDamage, this);
+		}
 	}
 }
 
