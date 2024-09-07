@@ -1,15 +1,18 @@
 ﻿#include "AagPlayGameMode.h"
-
 #include "agGameModeExtraData.h"
 #include "EngineUtils.h"
 #include "Again30/Manager/agMonsterMoveManager.h"
 #include "Again30/Monster/agMonsterBase.h"
+#include "Again30/Fish/agFish.h"
+#include "Again30/Manager/agMonsterMoveManager.h"
 #include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 
 AagPlayGameMode::AagPlayGameMode()
 	:
-	GenerationTime(30.f), CurGeneration(1)
+	GenerationTime(10.f), CurGeneration(1)
 {
+	CurGenerationTime = GenerationTime;
 }
 
 void AagPlayGameMode::PostInitializeComponents()
@@ -19,40 +22,120 @@ void AagPlayGameMode::PostInitializeComponents()
 	_setManagerContainer();
 }
 
+APawn* AagPlayGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer,
+	const FTransform& SpawnTransform)
+{
+	return nullptr;
+}
+
+APawn* AagPlayGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	return nullptr;
+}
+
 void AagPlayGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// @todo 야매
+	FSoftObjectPath extraDataPath = FSoftObjectPath( TEXT("/Script/Again30.agGameModeExtraData'/Game/Mode/DA_ModeExtraData.DA_ModeExtraData'"));
+	_extraData = Cast<UagGameModeExtraData>(extraDataPath.TryLoad());
+	if ( _extraData != nullptr ){
+		for ( auto managerType : _extraData->ManagerList ){
+			if ( managerType == EagManagerType::None ){
+				continue;
+			}
+			// @todo factory패턴으로 하고 싶었다.
+			auto newManagerObject = _createManager(managerType);
+			if (newManagerObject != nullptr)
+			{
+				newManagerObject->BeginPlay();
+				_managerContainer.Add(managerType, newManagerObject);
+			}
+		}
+	}
+
+	GameStart();
 }
 
 void AagPlayGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	float PrevTime = CurGenerationTime;
-	CurGenerationTime -= DeltaSeconds;
+	CalculateGenerationTime(DeltaSeconds);
+}
+
+void AagPlayGameMode::CalculateGenerationTime(float DeltaSeconds)
+{
+	// 물고기 사망-스폰 연출 중에는 시간 계산을 하지 않는다
+	if(bNowDoingFishProduction) [[unlikely]]
+	{
+		return;
+	}
 	
+	CurGenerationTime -= DeltaSeconds;
+	OnCurrentTimeChanged.Broadcast(CurGenerationTime);
+	if(CurGenerationTime < 0.f)
+	{
+		if(bNowDoingFishProduction == false)
+		{
+			GenerationEnd();
+		}
+	}
 }
 
 void AagPlayGameMode::GameStart()
 {
+	SpawnFish();
 }
 
 void AagPlayGameMode::GenerationStart()
 {
-	CurGenerationTime = GenerationTime;
+	if(bNowDoingFishProduction == false)
+	{
+		return;
+	}
 	
-	SpawnFish();
+	bNowDoingFishProduction = false;
+	CurGenerationTime = GenerationTime;
 	IncreaseGeneration();
 }
 
 void AagPlayGameMode::GenerationEnd()
 {
+	GetWorld()->GetFirstPlayerController()->UnPossess();
+	if(CurrentFish)
+	{
+		CurrentFish->PlayFishDeadProduction();
+	}
+	
+	bNowDoingFishProduction = true;
+	CurGenerationTime = 0.f;
+	OnCurrentTimeChanged.Broadcast(CurGenerationTime);
+	if(APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		FInputModeUIOnly InputModeUIOnly;
+		PlayerController->SetInputMode(InputModeUIOnly);
+	}
 }
 
 void AagPlayGameMode::IncreaseGeneration()
 {
 	CurGeneration += 1;
 	OnGenerationChanged.Broadcast(CurGeneration);
+}
+
+void AagPlayGameMode::FishWin()
+{
+	bNowDoingFishProduction = true;
+	if(APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		PlayerController->UnPossess();
+		FInputModeUIOnly InputModeUIOnly;
+		PlayerController->SetInputMode(InputModeUIOnly);
+	}
+
+	OnGameEndEvent.Broadcast();
 }
 
 bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>& manager )
@@ -68,18 +151,45 @@ bool AagPlayGameMode::GetManager(EagManagerType type, TObjectPtr<UagManagerBase>
 
 void AagPlayGameMode::SpawnFish()
 {
-	APlayerStart* StartPoint = GetPlayerStartPoint();
+	const APlayerStart* StartPoint = GetPlayerStartPoint();
 	if(StartPoint == nullptr || GetWorld() == nullptr) [[unlikely]]
 	{
 		return;
 	}
+	
+	if(GetWorld() == nullptr) [[unlikely]]
+	{
+		return;
+	}
 
-	FActorSpawnParameters SpawnParameters;
-	APawn* FishPawn = GetWorld()->SpawnActor<APawn>(StartPoint->GetActorLocation(), StartPoint->GetActorRotation(), SpawnParameters);
+	AagFish* FishPawn = GetWorld()->SpawnActorDeferred<AagFish>(DefaultPawnClass, FTransform(), this);
 	if(FishPawn)
 	{
-		
+		CurrentFish = FishPawn;
+		GetWorld()->GetFirstPlayerController()->Possess(FishPawn);
+		FishPawn->OnFishSpawnProductionEnd.AddUObject(this, &AagPlayGameMode::OnFishSpawnProductionEnd);
+		FishPawn->OnFishDeadProductionEnd.AddUObject(this, &AagPlayGameMode::OnFishDeadProductionEnd);
+		FActorSpawnParameters SpawnParameters;
+		const FTransform SpawnTransform{ StartPoint->GetActorRotation(), StartPoint->GetActorLocation() };
+		UGameplayStatics::FinishSpawningActor(CurrentFish, SpawnTransform);
+		CurrentFish->PlayFishSpawnProduction();
 	}
+}
+
+void AagPlayGameMode::OnFishDeadProductionEnd()
+{
+	SpawnFish();
+}
+
+void AagPlayGameMode::OnFishSpawnProductionEnd()
+{
+	if(APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		FInputModeGameOnly InputModeGameOnly;
+		PlayerController->SetInputMode(InputModeGameOnly);
+	}
+	
+	GenerationStart();
 }
 
 APlayerStart* AagPlayGameMode::GetPlayerStartPoint()
