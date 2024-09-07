@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "agWeaponBase.generated.h"
 
+class USoundCue;
 class IagDamageable;
 class UStaticMeshComponent;
 
@@ -28,6 +29,11 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
 	bool bPhysicsWeapon;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
+	TObjectPtr<USoundCue> WeaponHitSoundCue;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess=true))
+	float HitVolumeMultiplier;
 	
 private:
 
