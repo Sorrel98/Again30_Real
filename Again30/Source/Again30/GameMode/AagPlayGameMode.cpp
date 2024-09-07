@@ -151,6 +151,8 @@ void AagPlayGameMode::GenerationEnd()
 
 		PlayerController->FlushPressedKeys();
 	}
+
+	OnGenerationEndEvent.Broadcast();
 }
 
 void AagPlayGameMode::IncreaseGeneration()

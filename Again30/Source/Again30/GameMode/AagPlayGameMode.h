@@ -21,6 +21,7 @@ class AGAIN30_API AagPlayGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	FOnGameModeEvent OnGenerationEndEvent;
 	FOnGameModeEvent OnGameEndEvent;
 	FOnGenerationChanged OnGenerationChanged;	
 	FOnTimeChanged OnCurrentTimeChanged;
@@ -104,6 +105,7 @@ public:
 	void AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint);
 	bool GetMovePointLocation(EagMonsterMovePointType type, FVector& location);
 
+	FORCEINLINE AagFish* GetCurrentFish() const { return CurrentFish; }
 private:
 	void CalculateGenerationTime(float DeltaSeconds);
 	void SpawnFish();

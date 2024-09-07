@@ -93,6 +93,8 @@ public:
 
 	virtual void UnPossessed() override;
 
+	void MultiplyHopForce(float Factor);
+
 
 protected:
 	// Called when the game starts or when spawned
