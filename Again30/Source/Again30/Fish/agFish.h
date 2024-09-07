@@ -113,6 +113,9 @@ public:
 	void OnSpawnProductionEnd();
 	void OnDeadProductionEnd();
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnFishDead", Category = "Fish")
+	void K2_OnFishDead();
+
 
 protected:
 

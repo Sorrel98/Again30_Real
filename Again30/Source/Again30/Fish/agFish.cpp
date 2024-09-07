@@ -159,6 +159,8 @@ void AagFish::PlayFishDeadProduction()
 		GetMesh()->bPauseAnims = true;
 	}
 
+	K2_OnFishDead();
+
 	if(GetWorld())
 	{
 		FTimerDelegate TimerENdDelegate;
