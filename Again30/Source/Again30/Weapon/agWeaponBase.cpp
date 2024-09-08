@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 AagWeaponBase::AagWeaponBase()
@@ -98,6 +99,10 @@ void AagWeaponBase::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
 		{
+			if(WeaponHitSoundCue)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponHitSoundCue, GetActorLocation(), FRotator::ZeroRotator, HitVolumeMultiplier);
+			}
 			Damageable->DealDamage(WeaponDamage, this);
 			bAttacked = true;
 		}
@@ -130,6 +135,10 @@ void AagWeaponBase::OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* Other
 	{
 		if(IagDamageable* Damageable = Cast<IagDamageable>(OtherActor))
 		{
+			if(WeaponHitSoundCue)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponHitSoundCue, Hit.Location, FRotator::ZeroRotator, HitVolumeMultiplier);
+			}
 			Damageable->DealDamage(WeaponDamage, this);
 			bAttacked = true;
 		}
