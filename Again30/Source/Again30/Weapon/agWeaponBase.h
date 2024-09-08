@@ -46,6 +46,8 @@ public:
 	AagWeaponBase();
 
 	virtual void EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName AttackSocketName, ACharacter* Character);
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
 	virtual void RemoveWeapon();
 
 	virtual void DealDamageToTarget(IagDamageable* Target);
@@ -66,7 +68,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void OnWeaponHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess=true))
