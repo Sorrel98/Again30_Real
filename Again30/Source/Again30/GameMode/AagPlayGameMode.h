@@ -75,6 +75,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void GameStart();
+	void MonsterRandomLocationMove();
 	void GenerationStart();
 	void GenerationEnd();
 	void IncreaseGeneration();
@@ -107,6 +108,7 @@ public:
 	void RegisterMovePoint(EagMonsterMovePointType type, TObjectPtr<class AagMonsterMovePoint> movePoint);
 	void AddMonsterMovePoint(EagMonsterMovePointType type, const TObjectPtr<AagMonsterMovePoint>& movePoint);
 	bool GetMovePointLocation(EagMonsterMovePointType type, FVector& location);
+	bool GetMovePointRotation(EagMonsterMovePointType type, FRotator& rotator);
 
 	FORCEINLINE AagFish* GetCurrentFish() const { return CurrentFish; }
 private:

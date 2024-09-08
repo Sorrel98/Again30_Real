@@ -57,6 +57,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void InitLocation();
 	void ToggleDamageArea();
 	void DealDamageToPlayer();
 	void ModifyPlayer();

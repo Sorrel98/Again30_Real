@@ -12,7 +12,7 @@ void UagMainPlayWidget::SetGameTimeText(float CurrentGameTime)
 	
 	int32 Seconds = FMath::Floor(CurrentGameTime);
 	int32 Milliseconds = FMath::Floor((CurrentGameTime - Seconds)*100.f);
-	FString GameTimeString = FString::Printf(TEXT("%d : %d"), Seconds, Milliseconds);
+	FString GameTimeString = FString::Printf(TEXT("%d.%d"), Seconds, Milliseconds);
 	TimeText->SetText(FText::FromString(GameTimeString));
 }
 

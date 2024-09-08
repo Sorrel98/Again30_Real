@@ -105,6 +105,16 @@ void AagMonsterBase::MoveFinish()
 	SetState( EegMonsterState::Idle );
 }
 
+void AagMonsterBase::SetPrevPointType(EagMonsterMovePointType point)
+{
+	_prevPointType = point;
+}
+
+EagMonsterMovePointType AagMonsterBase::GetPrevPointType() const
+{
+	return _prevPointType;
+}
+
 EegMonsterState AagMonsterBase::GetState()
 {
 	return _attribute.state;

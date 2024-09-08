@@ -1,6 +1,7 @@
 ﻿#include "agWeaponBase.h"
 
 #include "Again30/agInterfaces/agDamageable.h"
+#include "Again30/Fish/agFish.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,10 +33,10 @@ void AagWeaponBase::EquipWeapon(USkeletalMeshComponent* SkeletalToAttach, FName 
 	{
 		WeaponMesh->AttachToComponent(SkeletalToAttach, AttachmentRules, AttackSocketName);
 	}
-	ACharacter* OwnerCharacter =  Cast<ACharacter>(SkeletalToAttach->GetOwner());
+	AagFish* OwnerCharacter =  Cast<AagFish>(SkeletalToAttach->GetOwner());
 	if(OwnerCharacter)
 	{
-		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedRate;
+		OwnerCharacter->MultiplyHopForce(MoveSpeedRate);
 	}
 
 	if(bPhysicsWeapon)
@@ -48,10 +49,10 @@ void AagWeaponBase::RemoveWeapon()
 {
 	if(WeaponMesh)
 	{
-		ACharacter* OwnerCharacter =  Cast<ACharacter>(WeaponMesh->GetAttachmentRoot()->GetOwner());
+		AagFish* OwnerCharacter =  Cast<AagFish>(WeaponMesh->GetAttachmentRoot()->GetOwner());
 		if(OwnerCharacter)
 		{
-			OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed /= MoveSpeedRate;
+			OwnerCharacter->MultiplyHopForce(1/MoveSpeedRate);
 		}
 		WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	}

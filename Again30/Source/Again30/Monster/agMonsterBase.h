@@ -52,6 +52,8 @@ public:
 	virtual void MoveMonster( EagMonsterMovePointType targetLocation );
 	FVector GetPointLocation( EagMonsterMovePointType locationPoint );
 	void MoveFinish();
+	void SetPrevPointType( EagMonsterMovePointType point );
+	EagMonsterMovePointType GetPrevPointType() const;
 
 	// state
 	UFUNCTION(BlueprintCallable)
@@ -99,6 +101,9 @@ protected:
 
 	UPROPERTY()
 	FvMonsterAttribute _attribute = FvMonsterAttribute();
+
+	UPROPERTY()
+	EagMonsterMovePointType _prevPointType = EagMonsterMovePointType::None;
 
 	// hp bar
 	UPROPERTY()

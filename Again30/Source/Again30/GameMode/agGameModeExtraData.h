@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30|Fish")
 	float GenerationTime = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Again30|Fish")
+	FSoftObjectPath PowerUp_Niagara;
 };

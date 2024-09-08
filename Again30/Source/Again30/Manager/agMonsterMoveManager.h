@@ -16,6 +16,7 @@ struct FvMonsterMoveData
 	float _movingElapsedTime = 0.f;
 	FVector _movingStartLocation = FVector::ZeroVector;
 	FVector _movingEndLocation = FVector::ZeroVector;
+	EagMonsterMovePointType _type = EagMonsterMovePointType::None;
 };
 
 /**
@@ -33,6 +34,7 @@ public:
 	
 	
 	bool GetMovePointLocation( EagMonsterMovePointType type, FVector& location );
+	bool GetMovePointRotation(EagMonsterMovePointType type, FRotator& rotator);
 	void RequestMoveToPoint(const TObjectPtr<class AagMonsterBase>& monster, EagMonsterMovePointType pointType, float duration);
 
 protected:

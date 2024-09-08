@@ -123,6 +123,31 @@ void AagPlayGameMode::GameStart()
 	SpawnFish();
 }
 
+void AagPlayGameMode::MonsterRandomLocationMove()
+{
+	// 짝수 Generation이었으면 Monster 위치 랜덤 이동
+	if( CurGeneration % 2 == 0 ){
+		if( CurrentMonster != nullptr ){
+			TObjectPtr<UagMonsterMoveManager> moveManager = nullptr;
+			if( GetManager(EagManagerType::MonsterMove, moveManager) == false){
+				return;
+			}
+			if( moveManager == nullptr ){
+				return;
+			}
+			// ECharacterType의 최소값과 최대값 정의
+			int32 MinValue = static_cast<int32>(EagMonsterMovePointType::Desk);
+			int32 MaxValue = static_cast<int32>(EagMonsterMovePointType::ElectricityController);
+
+			// 랜덤으로 값 선택
+			int32 RandomValue = FMath::RandRange(MinValue, MaxValue);
+
+			// 정수를 열거형 타입으로 변환
+			moveManager->RequestMoveToPoint( CurrentMonster, static_cast<EagMonsterMovePointType>(RandomValue), 3);
+		}
+	}
+}
+
 void AagPlayGameMode::GenerationStart()
 {
 	if(bNowDoingFishProduction == false)
@@ -132,6 +157,8 @@ void AagPlayGameMode::GenerationStart()
 	UE_LOG(LogTemp, Warning, TEXT("*** *** *** Generation Start"));
 	bNowDoingFishProduction = false;
 	CurGenerationTime = GenerationTime;
+
+	MonsterRandomLocationMove();
 }
 
 void AagPlayGameMode::GenerationEnd()
@@ -227,6 +254,15 @@ bool AagPlayGameMode::GetMovePointLocation(EagMonsterMovePointType type, FVector
 	return true;
 }
 
+bool AagPlayGameMode::GetMovePointRotation(EagMonsterMovePointType type, FRotator& rotator)
+{
+	if( _pointContainer.Contains(type) == false ){
+		return false;
+	}
+	rotator = _pointContainer[type]->GetActorRotation();
+	return true;
+}
+
 void AagPlayGameMode::SetProductionCamera(AagFish* FishPawn)
 {
 	if(bDisableProduction) [[unlikely]]
@@ -310,18 +346,16 @@ void AagPlayGameMode::OnFishSpawnProductionEnd()
 
 void AagPlayGameMode::PlayBGMSoundByHPPercentage()
 {
-	// TODO : 
-	bool bPlayFinalBGM = false;
+	bool bPlayFinalBGM = (CurGeneration > 1 && CurrentMonster && CurrentMonster->GetHp() < 30.f);
 	USoundCue* PlaySoundCue = bPlayFinalBGM ? FinalSound : NormalSound;
 	if(BGMComponent)
 	{
 		if(BGMComponent->IsPlaying())
 		{
-			if(BGMComponent->Sound != PlaySoundCue)
+			if(BGMComponent->Sound == PlaySoundCue)
 			{
-				BGMComponent->FadeOut(1.0f, 0.0f);		
+				return;
 			}
-			return;
 		}
 		BGMComponent->SetSound(PlaySoundCue);
 		BGMComponent->FadeOut(1.0f, 1.0f);	
